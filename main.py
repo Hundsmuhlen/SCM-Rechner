@@ -54,18 +54,22 @@ def results():
                 l1.append(float(request.form.get(f"a1{i}")))
             except ValueError:
                 return render_template("metrik_error.html", message=f"Fehler in Spalte 1, Zeile {i + 1}!")
+            except TypeError:
+                return render_template("metrik_error.html", message=f"Fehler in Spalte 1, Zeile {i + 1}!")
             try:
                 l2.append(float(request.form.get(f"a2{i}")))
             except ValueError:
+                return render_template("metrik_error.html", message=f"Fehler in Spalte 2, Zeile {i + 1}!")
+            except TypeError:
                 return render_template("metrik_error.html", message=f"Fehler in Spalte 2, Zeile {i + 1}!")
         p1 = np.array(l1)
         p2 = np.array(l2)
 
         return render_template("new_metriken_results.html",
-                               l22metrik=round(l22metrik(p1, p2), 4),
-                               l2metrik=round(l2metrik(p1, p2), 4),
-                               l1metrik=round(l1metrik(p1, p2), 4),
-                               l8metrik=round(l8metrik(p1, p2), 4)
+                               l22metrik=round(l22metrik(p1, p2), 7),
+                               l2metrik=round(l2metrik(p1, p2), 7),
+                               l1metrik=round(l1metrik(p1, p2), 7),
+                               l8metrik=round(l8metrik(p1, p2), 7)
                                )
 
 
