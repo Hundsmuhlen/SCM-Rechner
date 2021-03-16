@@ -2,6 +2,13 @@
 {% set active_page = "mp-und-radius" %}
 
 {% block body %}
+    In der nachfolgenden Tabelle sind die Ergebnisse von den MÜK aufgelistet. <br>
+    Die grün markierte Zeile stellt dabei den ersten MÜK dar, in dem alle Punkte enhalten sind.
+    Hier sind alle Werte auf True. Eventuell nachfolgende MÜKs werden nicht markiert, kann man aber anhand der
+    True / False recht easy ablesen. <br>
+    Die Mittelpunkte sind noch etwas schwer abzulesen, das steht aber noch auf der Liste.
+    <hr>
+
 <table class="table table-hover">
     <tr>
         {% for i in rows[0] %}
