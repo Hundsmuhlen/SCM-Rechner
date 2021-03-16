@@ -102,7 +102,10 @@ def mp_und_radius_input():
                 points.append(np.array([x, y]))
             except ValueError:
                 return render_template("mp_und_radius_error.html", message="Du musst für alle Punkte Werte eigeben.\n"
-                                                                           "Verwende Punkte statt Kommas!")
+                                                                           "Verwende Punkte statt Kommas! - ValueError")
+            except TypeError:
+                return render_template("mp_und_radius_error.html", message="Du musst für alle Punkte Werte eigeben.\n"
+                                                                           "Verwende Punkte statt Kommas! - TypeError")
 
         two = [i for i in combinations(points, 2)]
         print(f"Zweierkombinationen = {two}")
