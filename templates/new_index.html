@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+
+    <title>SCM Klausur Helfer</title>
+</head>
+<body>
+    <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-2 text-center">
+            Willkommen im SCM Klausur Helfer!
+        </h1>
+        <hp class="lead">
+            Hier sind einige Tools die dir bei der SCM Klausur hoffentlich helfen können!
+        </hp>
+        <div class="container">
+
+            {% include "nav_bar.html" %}
+            {% block navbar %} {% endblock %}
+
+        </div>
+
+        <div class="container mb-3 mt-5 text-center" >
+            <hr>
+            {% block body %}
+                Dieser Online Rechner hat ein paar der Algorithmen, die wir in SCM haben implementiert. Bis jetzt sind
+                die verschiedenen Metriken zu zwei Punkten von beliebig vielen Dimensionen möglich und die Minimal
+                überdeckenden Kreise von 2 Punkten und mit dem Mittelpunkt für 3 Punkte. Du kannst aber auch mehr Punkte
+                eingeben, aber nur 2-Dimensionale Punkte auf der Ebene. Was anderes hatten wir sowieso nicht. <br>
+                Statt eines Kommas musst du einen Punkt eingeben bei nicht natürlichen zahlen. <br>
+                Solltest du einen Fehler bekommen, gehe einfach wieder zurück.
+                <br>
+                <br>
+                Viel Erfolg bei der Klausur!
+                <br>
+                <br>
+                Sollte dir der Rechner geholfen haben würde ich mich über ein Bierchen freuen.
+                <br>
+                <a class="btn btn-outline-success mt-3" href="https://paypal.me/JanJacobE?locale.x=de_DE" target="_blank" rel="noopener noreferrer">PayPal Me </a>
+            {% endblock %}
+            {% block test %}{% endblock %}
+            <hr>
+        </div>
+
+        <a class="btn btn-outline-danger" href="/" role="button">Home</a>
+    </div>
+</body>
+</html>

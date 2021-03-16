@@ -1,0 +1,26 @@
+{% extends "new_index.html" %}
+{% set active_page = "metriken" %}
+
+{% block body%}
+    <div class="col-lg-6 col-lg-offset-3 mx-auto">
+
+        <ul class="list-group">
+          <li class="list-group-item d-flex justify-content-between align-items-center col-5">
+           l2 Metrik:
+            <span class="badge bg-primary rounded-pill">{{l2metrik}}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center col-5">
+            l2 quadrat Metrik:
+            <span class="badge bg-primary rounded-pill">{{l22metrik}}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center col-5">
+            l1 Metrik:
+            <span class="badge bg-primary rounded-pill">{{l1metrik}}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center col-5">
+            l unendlich Metrik:
+            <span class="badge bg-primary rounded-pill">{{l8metrik}}</span>
+          </li>
+        </ul>
+    </div>
+{% endblock %}

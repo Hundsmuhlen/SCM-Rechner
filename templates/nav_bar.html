@@ -1,0 +1,27 @@
+
+
+
+{% block navbar %}
+
+
+    {% set navigation_bar = [
+        ('/', 'index', 'Index'),
+        ('/metriken-dimensions', 'metriken', 'Metriken'),
+        ('/mittelpunkt-und-radius', 'mp-und-radius', 'Mittelpunkt'),
+        ('/impressum', 'impressum', 'Impressum')
+    ] -%}
+        {% set active_page = active_page|default('index') -%}
+
+
+
+    <nav class="nav nav-pills flex-column flex-sm-row mt-3">
+    {% for href, id, caption in navigation_bar %}
+      <a
+        {% if id == active_page %} class="flex-sm-fill text-sm-center nav-link active" aria-current="page"
+        {% else %} class="flex-sm-fill text-sm-center nav-link"
+        {% endif %}href="{{ href|e }}">
+          {{ caption|e }}
+      </a>
+    {% endfor %}
+    </nav>
+{% endblock %}
