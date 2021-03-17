@@ -1,6 +1,8 @@
 {% extends "new_index.html"%}
 {% set active_page = "metriken" %}
 {% block body %}
+
+
 <form method="post" action="/metriken-results">
     {% for i in range(dimensions)%}
         <div class="row gx-5 gy-5 pb-2">
