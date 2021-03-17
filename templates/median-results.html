@@ -1,0 +1,36 @@
+{% extends "new_index.html"%}
+{% set active_page = "median" %}
+
+{% block body %}
+    <h3>Schwerpunkt: {{ schwerpunkt }}</h3>
+    <hr>
+    <br>
+
+    <h2>Dominanzkriterium</h2>
+    <p></p>
+<table class="table table-hover">
+    <tr>
+        <th>Punkt Nr.</th>
+        <th>Koordinaten</th>
+        <th>Gewicht w</th>
+        <th>Gamma</th>
+        <th>Dominanzkriterium erfüllt</th>
+    </tr>
+    {% for row in range(punktezahl) %}
+
+        {% if fulfilled[row] %}
+            <tr class="table-success">
+        {% else %}
+            <tr>
+        {% endif %}
+
+            <th>{{ loop.index }}</th>
+            <td>{{ punkte[row] }}</td>
+            <td>{{ weights[row] }}</td>
+            <td>{{ gamma[row] }}</td>
+            <td>{{ fulfilled[row] }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

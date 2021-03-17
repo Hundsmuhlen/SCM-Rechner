@@ -39,6 +39,7 @@ def l8metrik(a,b):
 
 def domKrit(weights, punkte, aj):
     """
+    Dominanzkriterium
     :param weights: ohne das Gewicht des aktuellen kandidaten
     :param punkte: ohne den zu betrachtenden punkt
     :return:

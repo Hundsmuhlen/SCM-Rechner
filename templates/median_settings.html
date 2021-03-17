@@ -1,0 +1,14 @@
+{% extends "new_index.html"%}
+{% set active_page = "median" %}
+
+{% block body %}
+<form method="post" action="/median-settings" class="form-inline">
+    <div class="form-group col-4 mx-auto mb-2">
+        <input type="number" name="nr_of_points" placeholder="Wie viele zweidimensionale Punkte willst du eingeben?" class="form-control mx-auto text-center" autofocus>
+    </div>
+    <div class="col-4 mx-auto">
+         <button class="btn btn-primary" type="submit">Submit </button>
+    </div>
+</form>
+
+{% endblock %}

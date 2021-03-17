@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect
-from ScmTest2 import l2metrik, l8metrik, l22metrik, l1metrik, domKrit
+from ScmTest2 import l2metrik, l8metrik, l22metrik, l1metrik, domKrit, schwerpunkt
 import numpy as np
 import re
 from flask import send_from_directory
@@ -15,6 +15,7 @@ class state():
     amount_2d_points = 0
 
 
+
 @app.route("/")
 def home():
     return render_template("new_index.html")
@@ -23,6 +24,76 @@ def home():
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon2.ico')
+
+@app.route("/median-settings", methods=["GET","POST"])
+def median_settings():
+    if request.method == "GET":
+        return render_template("median_settings.html")
+    if request.method == "POST":
+        try:
+            state.amount_2d_points = int(request.form.get("nr_of_points"))
+        except ValueError:
+            return render_template("median-error.html", message="Du musst eine positive Anzahl an Punkten eingeben!")
+        return render_template("median-input.html", dimensions=state.amount_2d_points)
+
+@app.route("/median-input", methods=["GET","POST"])
+def median_input():
+    """
+    Hier werden Schwerpunkt, verschärftes Dominanzkriterium und ein paar weiszfeld iterationen berechnet
+    dabei greifen wir auch auf den state zurück mit den 2d-points. Sind ja hier auch wieder 2d Punkte
+    :return:
+    """
+    if request.method == "POST":
+        weights = []
+        punkte = []
+        dominanzkriterium = []
+        fulfilled = []
+        sp = None
+        delta = None
+        weiszfeld_results = []
+
+        for i in range(state.amount_2d_points):
+            weights.append(float(request.form.get(f"w{i+1}")))
+        print(weights)
+
+        for i in range(state.amount_2d_points):
+            x = float(request.form[f"x{i+1}"])
+            y = float(request.form[f"y{i+1}"])
+            punkte.append(np.array([x, y]))
+
+        for ind, aj in enumerate(punkte):
+            points = [e for indi, e in enumerate(punkte) if indi != ind]
+            gewichte = weights[:]  # fastest way to copy
+            gewichte.pop(ind)
+            dk = domKrit(gewichte, points, aj)
+            print(dk)
+            print(points)
+            print(gewichte)
+            dominanzkriterium.append(round(dk, 4))
+
+        for d, w in zip(dominanzkriterium,weights):
+            if d <= w:
+                fulfilled.append(True)
+            else:
+                fulfilled.append(False)
+        sp = schwerpunkt(weights=weights, punkte=punkte)
+
+        #Platz für den Weizfeld
+        if all(fulfilled) == False:
+            pass
+
+
+
+        return render_template("median-results.html",
+                               schwerpunkt=sp,
+                               weights=weights,
+                               punkte=punkte,
+                               gamma=dominanzkriterium,
+                               fulfilled=fulfilled,
+                               punktezahl=state.amount_2d_points)
+
+
+
 
 
 @app.route("/metriken-dimensions", methods=["GET"])
@@ -45,7 +116,7 @@ def metriken():
 
 
 @app.route("/metriken-results", methods=["POST", "GET"])
-def results():
+def metriken_results():
     if request.method == "POST":
         l1 = []
         l2 = []
