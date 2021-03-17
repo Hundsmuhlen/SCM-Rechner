@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect
 from ScmTest2 import l2metrik, l8metrik, l22metrik, l1metrik, domKrit, schwerpunkt
 import numpy as np
 import re
+from itertools import combinations
 from flask import send_from_directory
 import os
 
@@ -92,8 +93,59 @@ def median_input():
                                fulfilled=fulfilled,
                                punktezahl=state.amount_2d_points)
 
+@app.route("/metriken-multi-settings", methods=["GET", "POST"])
+def metriken_multiple_points_settings():
+    if request.method == "GET":
+        return render_template("metriken_multi_settings.html")
+    if request.method == "POST":
+        try:
+            state.amount_2d_points = int(request.form.get("nr_of_points"))
+        except ValueError:
+            return render_template("metriken_multi_error.html", message="Du musst eine positive Anzahl an Punkten eingeben!")
+        return render_template("metriken_multi_input.html", dimensions=state.amount_2d_points)
+
+@app.route("/metriken-multi-input", methods=["POST"])
+def metriken_multi_points_input():
+    points = []
+    two = []
+    rows = []
+
+    for i in range(state.amount_2d_points):
+        try:
+            x = float(request.form.get(f"x{i + 1}"))
+            y = float(request.form.get(f"y{i + 1}"))
+            print(f"x = {x}, y = {y}")
+            points.append(np.array([x, y]))
+        except ValueError:
+            return render_template("mp_und_radius_error.html", message="Du musst für alle Punkte Werte eigeben.\n"
+                                                                       "Verwende Punkte statt Kommas! - ValueError")
+        except TypeError:
+            return render_template("mp_und_radius_error.html", message="Du musst für alle Punkte Werte eigeben.\n"
+                                                                       "Verwende Punkte statt Kommas! - TypeError")
+    two = [i for i in combinations(points, 2)]
+
+    for combi in two:
+        row = []
+        row.append(np.asarray(combi))
+        p1 = combi[0]
+        p2 = combi[1]
+
+        l1 = round(l1metrik(p1, p2), 4)
+        l2 = round(l2metrik(p1, p2), 4)
+        l22 = round(l22metrik(p1, p2), 4)
+        l8 = round(l8metrik(p1, p2), 4)
+
+        print(f"l1 {l1}, l2 {l2}, l22 {l22}, l8 {l8}")
 
 
+        row.append(l1)
+        row.append(l2)
+        row.append(l22)
+        row.append(l8)
+
+        rows.append(row)
+
+    return render_template("metriken_multi_results.html", rows=rows)
 
 
 @app.route("/metriken-dimensions", methods=["GET"])

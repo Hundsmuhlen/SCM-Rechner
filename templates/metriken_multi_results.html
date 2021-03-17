@@ -1,0 +1,25 @@
+{% extends "new_index.html"%}
+{% set active_page = "metriken-multi" %}
+
+{% block body %}
+
+
+<table class="table table-hover">
+    <tr>
+        <th>Punkt-Kombination</th>
+        <th>L1 Metrik</th>
+        <th>L2 Metrik</th>
+        <th>L2² (quadrat) Metrik</th>
+        <th>L-unendlich Metrik</th>
+
+    </tr>
+    {% for row in rows %}
+        <tr>
+            {% for i in row %}
+                    <td>{{ i }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

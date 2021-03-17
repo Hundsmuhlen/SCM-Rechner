@@ -1,0 +1,29 @@
+{% extends "new_index.html"%}
+{% set active_page = "metriken-multi" %}
+
+{% block body %}
+     <h3>Metriken für mehrere 2D Punkte</h3>
+    Hier werden die 4 verschiedenen uns aus der Vorlesung bekannten Metriken zwischen 2 Punkten berechnet. <br>
+    Dafür musst du zuerst die Anzahl der Punkte angeben zwischen denen du die Abstände berechnet haben möchtest <br>
+    <b>Jede der Zeilen steht für einen 2 Dimensionalen Vektor!</b>
+    <br>
+    <hr>
+
+
+<form method="post" action="/metriken-multi-input" class="mx-auto">
+    {% for i in range(dimensions)%}
+    <div class="row gx-5 gy-5 mx-auto">
+              <div class="col-2">
+                <input type="text" class="form-control mb-1" placeholder="{{i+1}}. Vektor X-Wert"  name="x{{i+1}}" autofocus>
+              </div>
+              <div class="col-2">
+                <input type="text" class="form-control mb-1" placeholder="{{i+1}}. Vektor Y-Wert"  name="y{{i+1}}">
+              </div>
+    </div>
+    {% endfor %}
+    <div class="col-4 mx-auto">
+         <button class="btn btn-primary" type="submit">Submit </button>
+    </div>
+</form>
+
+{% endblock %}
