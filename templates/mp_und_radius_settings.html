@@ -1,0 +1,27 @@
+{% extends "new_index.html"%}
+{% set active_page = "mp-und-radius" %}
+
+{% block body %}
+    <h3>Mittelpunkt und Minimal überdeckende Kreise</h3>
+    Gib zuerst die Anzahl deiner Punkte ein. Danach die Werte für jeden Punkt. Du bekommst dann automatisch
+    eine Tabelle mit dem Radius und Mittelpunkt des Kreises zwischen allen 2er und 3er Kombinationen aus Punkten in der Menge der
+    Punkte die du angegeben hast.
+    <br>
+    <br>
+    <b>Der erste Kreis in dem alle Punkte liegen (alle Ergebnisse auf True) wird grün markiert. Dies sollte dann in aller Regel der
+    minimal überdeckende Kreis sein.</b>
+    <br>
+    <br>
+    Da hier nur die möglichen 2er und 3er Kombinationen überprüft werden kann es dazu kommen, dass es keinen MÜK gibt.
+    Ist für die Klausur aber super unwahrscheinlich, da wir keinen Algorithmus hatten, der den MÜK für mehr als 3 Punkte bestimmt.
+    <hr>
+<form method="post" action="/mittelpunkt-und-radius" class="form-inline">
+    <div class="form-group col-4 mx-auto mb-2">
+        <input type="number" name="nr_of_points" placeholder="Wie viele zweidimensionale Punkte willst du eingeben?" class="form-control mx-auto text-center" autofocus>
+    </div>
+    <div class="col-4 mx-auto">
+         <button class="btn btn-primary" type="submit">Submit </button>
+    </div>
+</form>
+
+{% endblock %}

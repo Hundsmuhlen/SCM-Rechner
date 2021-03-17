@@ -98,7 +98,7 @@ def median_input():
 
 @app.route("/metriken-dimensions", methods=["GET"])
 def metriken_dimensions():
-    return render_template("new_metriken.html")
+    return render_template("metriken_settings.html")
 
 
 @app.route("/metriken-settings", methods=["POST", "GET"])
@@ -107,12 +107,12 @@ def metriken():
         try:
             dimensions = int(request.form.get("dimensions"))
         except ValueError:
-            return render_template("metrik_error.html", message="You have to enter the wanted dimensions!")
+            return render_template("metriken_error.html", message="You have to enter the wanted dimensions!")
         if dimensions < 1 or dimensions == None:
-            return render_template("metrik_error.html", message="Have to have more than 0 dimensions!")
+            return render_template("metriken_error.html", message="Have to have more than 0 dimensions!")
         else:
             state.dimensions = dimensions
-            return render_template("new_metriken_input.html", dimensions=dimensions)
+            return render_template("metriken_input.html", dimensions=dimensions)
 
 
 @app.route("/metriken-results", methods=["POST", "GET"])
@@ -124,30 +124,30 @@ def metriken_results():
             try:
                 l1.append(float(request.form.get(f"a1{i}")))
             except ValueError:
-                return render_template("metrik_error.html", message=f"Fehler in Spalte 1, Zeile {i + 1}!")
+                return render_template("metriken_error.html", message=f"Fehler in Spalte 1, Zeile {i + 1}!")
             except TypeError:
-                return render_template("metrik_error.html", message=f"Fehler in Spalte 1, Zeile {i + 1}!")
+                return render_template("metriken_error.html", message=f"Fehler in Spalte 1, Zeile {i + 1}!")
             try:
                 l2.append(float(request.form.get(f"a2{i}")))
             except ValueError:
-                return render_template("metrik_error.html", message=f"Fehler in Spalte 2, Zeile {i + 1}!")
+                return render_template("metriken_error.html", message=f"Fehler in Spalte 2, Zeile {i + 1}!")
             except TypeError:
-                return render_template("metrik_error.html", message=f"Fehler in Spalte 2, Zeile {i + 1}!")
+                return render_template("metriken_error.html", message=f"Fehler in Spalte 2, Zeile {i + 1}!")
         p1 = np.array(l1)
         p2 = np.array(l2)
 
-        return render_template("new_metriken_results.html",
-                               l22metrik=round(l22metrik(p1, p2), 7),
-                               l2metrik=round(l2metrik(p1, p2), 7),
-                               l1metrik=round(l1metrik(p1, p2), 7),
-                               l8metrik=round(l8metrik(p1, p2), 7)
+        return render_template("metriken_results.html",
+                               l22metrik=round(l22metrik(p1, p2), 4),
+                               l2metrik=round(l2metrik(p1, p2), 4),
+                               l1metrik=round(l1metrik(p1, p2), 4),
+                               l8metrik=round(l8metrik(p1, p2), 4)
                                )
 
 
 @app.route("/mittelpunkt-und-radius", methods=["POST", "GET"])
 def mp_und_rad():
     if request.method == "GET":
-        return render_template("amount_points.html")
+        return render_template("mp_und_radius_settings.html")
     if request.method == "POST":
         try:
             state.amount_2d_points = int(request.form.get("nr_of_points"))
