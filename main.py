@@ -1,11 +1,10 @@
 from flask import Flask, render_template, request, redirect
-from ScmTest2 import l2metrik, l8metrik, l22metrik, l1metrik, domKrit, schwerpunkt
+from ScmTest2 import l2metrik, l8metrik, l22metrik, l1metrik, domKrit, schwerpunkt, entfernung, delta, weiszfeld
 import numpy as np
 import re
 from itertools import combinations
 from flask import send_from_directory
 import os
-
 
 app = Flask(__name__)
 
@@ -14,7 +13,7 @@ class state():
     dimensions = 0
     dimensions_set = False
     amount_2d_points = 0
-
+    delta_nr = 0
 
 
 @app.route("/")
@@ -26,7 +25,8 @@ def home():
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon2.ico')
 
-@app.route("/median-settings", methods=["GET","POST"])
+
+@app.route("/median-settings", methods=["GET", "POST"])
 def median_settings():
     if request.method == "GET":
         return render_template("median_settings.html")
@@ -34,10 +34,21 @@ def median_settings():
         try:
             state.amount_2d_points = int(request.form.get("nr_of_points"))
         except ValueError:
-            return render_template("median-error.html", message="Du musst eine positive Anzahl an Punkten eingeben!")
-        return render_template("median-input.html", dimensions=state.amount_2d_points)
+            return render_template("median_error.html", message="Du musst eine positive Anzahl an Punkten eingeben!")
 
-@app.route("/median-input", methods=["GET","POST"])
+        try:
+            
+            state.delta_nr = float(request.form.get("weiszfeld_delta"))
+            print(state.delta_nr)
+        except ValueError:
+            state.delta_nr = 0
+        except TypeError:
+            state.delta_nr = 0
+
+        return render_template("median_input.html", dimensions=state.amount_2d_points)
+
+
+@app.route("/median-input", methods=["GET", "POST"])
 def median_input():
     """
     Hier werden Schwerpunkt, verschärftes Dominanzkriterium und ein paar weiszfeld iterationen berechnet
@@ -50,16 +61,17 @@ def median_input():
         dominanzkriterium = []
         fulfilled = []
         sp = None
-        delta = None
+        entfernungen = []
         weiszfeld_results = []
+        show_weiszfeld = False
 
         for i in range(state.amount_2d_points):
-            weights.append(float(request.form.get(f"w{i+1}")))
+            weights.append(float(request.form.get(f"w{i + 1}")))
         print(weights)
 
         for i in range(state.amount_2d_points):
-            x = float(request.form[f"x{i+1}"])
-            y = float(request.form[f"y{i+1}"])
+            x = float(request.form[f"x{i + 1}"])
+            y = float(request.form[f"y{i + 1}"])
             punkte.append(np.array([x, y]))
 
         for ind, aj in enumerate(punkte):
@@ -72,26 +84,62 @@ def median_input():
             print(gewichte)
             dominanzkriterium.append(round(dk, 4))
 
-        for d, w in zip(dominanzkriterium,weights):
+        for d, w in zip(dominanzkriterium, weights):
             if d <= w:
                 fulfilled.append(True)
             else:
                 fulfilled.append(False)
-        sp = schwerpunkt(weights=weights, punkte=punkte)
 
-        #Platz für den Weizfeld
-        if all(fulfilled) == False:
-            pass
+        # l22 metrik:
+        sp = np.round(schwerpunkt(weights=weights, punkte=punkte), 4)
+        entfernungen.append(round(entfernung(weights, punkte, sp, l22metrik), 4))
+        entfernungen.append(round(entfernung(weights, punkte, sp, l2metrik), 4))
+        entfernungen.append(round(entfernung(weights, punkte, sp, l1metrik), 4))
+        entfernungen.append(round(entfernung(weights, punkte, sp, l8metrik), 4))
 
+        # Platz für den Weizfeld
 
+        print(f"Fulfilled Array: {fulfilled}")
+        print(f"State.delta = {state.delta_nr}")
+        if not any(fulfilled) and state.delta_nr > 0:
+            print("weiszfeld wurde ausgelöst!!!")
+            show_weiszfeld = True
+            max_rounds = 10
+            round_counter = 0
+            d = 1
 
-        return render_template("median-results.html",
+            x = sp
+            fx = round(entfernung(weights, punkte, sp, l2metrik), 4)
+            weiszfeld_results = []
+            weiszfeld_results.append([x, fx, "---"])
+
+            while round_counter < max_rounds and d > state.delta_nr:
+                x_new = weiszfeld(weights=weights, punkte=punkte, xk=x)
+                fx_new = round(entfernung(weights, punkte, x_new, l2metrik), 4)
+                print(f"fx alt : {fx}, fx neu: {fx_new}, x neu: {x_new}, x alt: {x}")
+                try:
+                    d = delta(fx, fx_new)
+                except Exception:
+                    print(Exception)
+                print(f"delta = {d}")
+                x = x_new
+                fx = fx_new
+                results = [x, fx, d]
+                weiszfeld_results.append(results)
+
+                round_counter += 1
+
+        return render_template("median_results.html",
                                schwerpunkt=sp,
+                               entfernungen=entfernungen,
                                weights=weights,
                                punkte=punkte,
                                gamma=dominanzkriterium,
                                fulfilled=fulfilled,
-                               punktezahl=state.amount_2d_points)
+                               punktezahl=state.amount_2d_points,
+                               show_weiszfeld=show_weiszfeld,
+                               weiszfeld_results=weiszfeld_results)
+
 
 @app.route("/metriken-multi-settings", methods=["GET", "POST"])
 def metriken_multiple_points_settings():
@@ -101,8 +149,10 @@ def metriken_multiple_points_settings():
         try:
             state.amount_2d_points = int(request.form.get("nr_of_points"))
         except ValueError:
-            return render_template("metriken_multi_error.html", message="Du musst eine positive Anzahl an Punkten eingeben!")
+            return render_template("metriken_multi_error.html",
+                                   message="Du musst eine positive Anzahl an Punkten eingeben!")
         return render_template("metriken_multi_input.html", dimensions=state.amount_2d_points)
+
 
 @app.route("/metriken-multi-input", methods=["POST"])
 def metriken_multi_points_input():
@@ -117,11 +167,11 @@ def metriken_multi_points_input():
             print(f"x = {x}, y = {y}")
             points.append(np.array([x, y]))
         except ValueError:
-            return render_template("mp_und_radius_error.html", message="Du musst für alle Punkte Werte eigeben.\n"
-                                                                       "Verwende Punkte statt Kommas! - ValueError")
+            return render_template("metriken_multi_error.html", message="Du musst für alle Punkte Werte eigeben.\n"
+                                                                        "Verwende Punkte statt Kommas! - ValueError")
         except TypeError:
-            return render_template("mp_und_radius_error.html", message="Du musst für alle Punkte Werte eigeben.\n"
-                                                                       "Verwende Punkte statt Kommas! - TypeError")
+            return render_template("metriken_multi_error.html", message="Du musst für alle Punkte Werte eigeben.\n"
+                                                                        "Verwende Punkte statt Kommas! - TypeError")
     two = [i for i in combinations(points, 2)]
 
     for combi in two:
@@ -136,7 +186,6 @@ def metriken_multi_points_input():
         l8 = round(l8metrik(p1, p2), 4)
 
         print(f"l1 {l1}, l2 {l2}, l22 {l22}, l8 {l8}")
-
 
         row.append(l1)
         row.append(l2)
@@ -204,7 +253,8 @@ def mp_und_rad():
         try:
             state.amount_2d_points = int(request.form.get("nr_of_points"))
         except ValueError:
-            return render_template("mp_und_radius_error.html", message="Du musst eine positive Anzahl an Punkten eingeben!")
+            return render_template("mp_und_radius_error.html",
+                                   message="Du musst eine positive Anzahl an Punkten eingeben!")
         return render_template("mp_und_radius_input.html", dimensions=state.amount_2d_points)
 
 
@@ -250,8 +300,8 @@ def mp_und_radius_input():
             # erzeugt für jede zweier Kombination einen Kreis dazwischen und überprüft, welche Punkte darin liegen
             row = [np.asarray(combi)]
             mp, radius = mittelpunkt_und_radius(combi[0], combi[1])
-            row.append(np.round(mp,4))
-            row.append(round(radius,4))
+            row.append(np.round(mp, 4))
+            row.append(round(radius, 4))
 
             for point in points:
                 row.append(punkt_im_radius(mp, radius, point))
@@ -265,9 +315,9 @@ def mp_und_radius_input():
             a, b, c = combi[0], combi[1], combi[2]
             mi1 = bi1 = mi2 = bi2 = x = y = None
 
-            #------------
+            # ------------
             try:
-                #Testen ob es eine Mittelsenkrecht gibt, oder ob beide Werte auf gleicher Höhe liegen
+                # Testen ob es eine Mittelsenkrecht gibt, oder ob beide Werte auf gleicher Höhe liegen
                 mi1, bi1 = mittelsenkrechte(a, b)
                 mi2, bi2 = mittelsenkrechte(a, c)
             except ValueError:
@@ -283,18 +333,17 @@ def mp_und_radius_input():
                         print("Alle 3 Punkte liegen auf der gleichen Achse")
                         mp, radius = mp_und_radius_drei_auf_gleicher_achse(a, b, c)
 
-
             try:
-                #Testen ob es einen Schnittpunkt gibt
+                # Testen ob es einen Schnittpunkt gibt
                 if radius == 0:
                     print(f"{mi1} -- {bi1} -- {mi2} -- {bi2}")
                     x, y = schnittpunkt_ms(mi1, bi1, mi2, bi2)
                     mp = np.array([x, y])
                     radius = l2metrik(mp, a)
             except ValueError:
-                #Es gibt keinen Schnittpunkt der Achsen -> die Punkte liegen alle auf einer Achse
-                mp, radius = mp_und_radius_drei_auf_gleicher_achse(a,b,c)
-            #---------------
+                # Es gibt keinen Schnittpunkt der Achsen -> die Punkte liegen alle auf einer Achse
+                mp, radius = mp_und_radius_drei_auf_gleicher_achse(a, b, c)
+            # ---------------
             # if a[1] == b[1] == c[1]:
             #     possible_points = []
             #     possible_points.append(mittelpunkt_und_radius(a, b))
@@ -308,22 +357,22 @@ def mp_und_radius_input():
             # mp = np.array([x, y])
             # radius = l2metrik(mp, a)
 
-            row.append(np.round(mp,4))
-            row.append(round(radius,4))
+            row.append(np.round(mp, 4))
+            row.append(round(radius, 4))
             for point in points:
                 row.append(punkt_im_radius(mp, radius, point))
             rows.append(row)
 
         for ind, row in enumerate(rows):
             # Check mal ab, was da so rauskommt
-            #print(f"ROWS : {row}")
+            # print(f"ROWS : {row}")
             try:
                 print(row)
                 if all(row[3:]) and minimal_überdeckender_kreis == None:
                     minimal_überdeckender_kreis = ind
                     print(f"MÜK bei index: {minimal_überdeckender_kreis}")
             except ValueError:
-                #print("ValueError bei Checken der Ergebnisse")
+                # print("ValueError bei Checken der Ergebnisse")
                 pass
         return render_template("mp_und_radius_results.html", rows=rows, muek=minimal_überdeckender_kreis)
 

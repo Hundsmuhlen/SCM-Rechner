@@ -3,10 +3,18 @@
 
 {% block body %}
     In der nachfolgenden Tabelle sind die Ergebnisse von den MÜK aufgelistet. <br>
-    Die grün markierte Zeile stellt dabei den ersten MÜK dar, in dem alle Punkte enhalten sind.
+    Die grün markierte Zeile stellt dabei den ersten MÜK dar, in dem <b>alle</b> Punkte enhalten sind.
     Hier sind alle Werte auf True. Eventuell nachfolgende MÜKs werden nicht markiert, kann man aber anhand der
     True / False recht easy ablesen. <br>
-    Die Mittelpunkte sind noch etwas schwer abzulesen, das steht aber noch auf der Liste.
+    <br>
+    Bei den Kombinationen aus zwei Punkten wird jeweils der Kreis um den Mittelpunkt der Geraden zwischen den beiden gebildet.
+    <br>
+    Bei den Kombinationen aus drei Punkten wird ein Kreis aus dem Schnittpunkt der Mittelsenkrechten gebildet.
+    <b>Es kann gut sein, dass die 3 Punkte bereits schon in einem anderen MÜK sind!</b> Das wird hier nicht noch extra geprüft!
+    Da wird einfach nur stump der Algorithmus ausgeführt. Wenn ihr einen MÜK sucht, in dem nicht alle Punkte enthalten sind,
+    müsst ihr bei dem True / False Teil der Tabelle schauen!
+    <br>
+    <b>True heißt, der Punkt befindet sich im Kreis der jeweiligen Zeile</b>
     <hr>
 
 <table class="table table-hover">

@@ -48,6 +48,12 @@ def domKrit(weights, punkte, aj):
     return l2metrik(sum([wi*((aj-ai)/l2metrik(aj,ai)) for wi,ai in zip(weights,punkte)]),nullvektor)
 
 def delta(k, k1):
+    """
+
+    :param k: f(xk)
+    :param k1: f(xk+1) - also dem x k+1, also dem neueren
+    :return:
+    """
     return ((k-k1)/k)
 
 def schwerpunkt(weights,punkte):
@@ -56,10 +62,10 @@ def schwerpunkt(weights,punkte):
     nenner = sum(weights)
     return zähler/nenner
 
-def entfernung(weights, punkte, center):
-    return sum([w*l2metrik(p,center) for w,p in zip(weights,punkte)])
+def entfernung(weights, punkte, center, metrik):
+    return sum([w*metrik(p, center) for w, p in zip(weights, punkte)])
 
-def weizfeld(weights, punkte, xk):
+def weiszfeld(weights, punkte, xk):
     zähler = sum ([w *(ai/(l2metrik(xk,ai))) for w, ai in zip(weights,punkte)])
     nenner = sum([w/(l2metrik(xk,ai)) for w,ai in zip(weights, punkte)])
     return (zähler/nenner)
@@ -84,9 +90,9 @@ def main():
     print(f"Schwerpunkt : {schwerpunkt(weights, punkte)}")
     sp = schwerpunkt(weights, punkte)
 
-    print(f"Weizfeld 1: {weizfeld(weights,punkte, center)}")
-    xk = weizfeld(weights,punkte, center)
-    print(f"{delta(entfernung(weights, punkte, center),entfernung(weights, punkte, xk))}")
+    print(f"Weizfeld 1: {weiszfeld(weights,punkte, center)}")
+    xk = weiszfeld(weights,punkte, center)
+    print(f"{delta(entfernung(weights, punkte, center, l2metrik),entfernung(weights, punkte, xk, l2metrik))}")
     print(f"Entfernung2 : {entfernung(weights, punkte, xk)}")
 
 
@@ -124,7 +130,7 @@ def SpUndEntfernung():
 
     print(f"Schwerpunkt : {schwerpunkt(weights, punkte)}")
     center = schwerpunkt(weights, punkte)
-    print(f"Entfernung pro Woche: {entfernung(weights,punkte, center)}")
+    print(f"Entfernung pro Woche: {entfernung(weights,punkte, center, l2metrik())}")
 
 
 
