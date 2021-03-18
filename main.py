@@ -37,7 +37,7 @@ def median_settings():
             return render_template("median_error.html", message="Du musst eine positive Anzahl an Punkten eingeben!")
 
         try:
-            
+
             state.delta_nr = float(request.form.get("weiszfeld_delta"))
             print(state.delta_nr)
         except ValueError:
