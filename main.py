@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect
 from ScmTest2 import l2metrik, l8metrik, l22metrik, l1metrik, domKrit, schwerpunkt, entfernung, delta, weiszfeld
+from ScmTest3 import matrix_from_weights_vector
 import numpy as np
 import re
 from itertools import combinations
@@ -14,6 +15,7 @@ class state():
     dimensions_set = False
     amount_2d_points = 0
     delta_nr = 0
+    graph_dimensions = None
 
 
 @app.route("/")
@@ -24,6 +26,53 @@ def home():
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon2.ico')
+
+
+@app.route("/graph-settings", methods=["GET", "POST"])
+def graph_settings():
+    if request.method == "GET":
+        return render_template("graph_settings.html")
+    if request.method == "POST":
+        try:
+            state.graph_dimensions = int(request.form.get("graph_dimensions"))
+        except ValueError:
+            return render_template("median_error.html", message="Du musst eine positive Anzahl an Punkten eingeben!")
+
+        return render_template("graph_input.html", dimensions=state.graph_dimensions)
+
+@app.route("/graph-input", methods=["POST"])
+def graph_input():
+    weights_vector = []
+    weights_matrix = []
+    dist_matrix = []
+    weighted_matrix = []
+    matrix_sum = []
+    matrix_max = []
+    result = []
+
+    for i in range(state.graph_dimensions):
+        weights_vector.append(float(request.form.get(f"w{i + 1}")))
+    print(weights_vector)
+
+    for row in range(state.graph_dimensions):
+        r = []
+        for col in range(state.graph_dimensions):
+            r.append(float(request.form.get(f"{row + 1}{col + 1}")))
+        dist_matrix.append(r)
+
+    weights_matrix = matrix_from_weights_vector(weights_vector)
+    weighted_matrix = np.matmul(np.array(weights_matrix), np.array(dist_matrix))
+    matrix_sum = np.asarray(weighted_matrix.sum(axis=0))
+    matrix_max = np.asarray(np.amax(weighted_matrix, axis=0))
+
+    result.append(matrix_sum)
+    result.append(matrix_max)
+    result.append(np.asarray(weighted_matrix))
+    print(result)
+
+
+    return render_template("graph_results.html", results=result)
+
 
 
 @app.route("/median-settings", methods=["GET", "POST"])
@@ -269,7 +318,7 @@ def mp_und_radius_input():
         two: tuple = []
         three: tuple = []
         rows = []
-        minimal_überdeckender_kreis = None
+        minimal_überdeckender_kreis = []
 
         for i in range(state.amount_2d_points):
             try:
@@ -368,8 +417,8 @@ def mp_und_radius_input():
             # print(f"ROWS : {row}")
             try:
                 print(row)
-                if all(row[3:]) and minimal_überdeckender_kreis == None:
-                    minimal_überdeckender_kreis = ind
+                if all(row[3:]):
+                    minimal_überdeckender_kreis.append(ind)
                     print(f"MÜK bei index: {minimal_überdeckender_kreis}")
             except ValueError:
                 # print("ValueError bei Checken der Ergebnisse")

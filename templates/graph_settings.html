@@ -1,0 +1,20 @@
+{% extends "new_index.html"%}
+{% set active_page = "graph" %}
+
+{% block body %}
+    <h3>Median und Centerprobleme bei gewichteten zusammenhängenden Graphen</h3>
+    Hier werden die Spaltensummen und Maxima, sowie die gewichtete Distanzmatrix berechnet.
+    Du musst zuerst aber definieren, wie viele Punkte dein Graph besitzt.
+
+    <br>
+    <hr>
+<form method="post" action="/graph-settings" class="form-inline">
+    <div class="form-group col-4 mx-auto mb-2">
+        <input type="number" name="graph_dimensions" placeholder="Wie viele Punkte hat dein Graph?" class="form-control mx-auto text-center" autofocus>
+    </div>
+    <div class="col-4 mx-auto">
+         <button class="btn btn-primary" type="submit">Submit </button>
+    </div>
+</form>
+
+{% endblock %}

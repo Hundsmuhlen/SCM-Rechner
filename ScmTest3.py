@@ -114,6 +114,25 @@ def matrix_mulitplikation():
     print(np.amax(ergebnis, axis=0))
 
 
+def matrix_from_weights_vector(weights_vector):
+        matrix = []
+        dimensions = len(weights_vector)
+        for index, weight in enumerate(weights_vector):
+            row = []
+            for i in range(dimensions):
+                if i == index:
+                    row.append(weight)
+                else:
+                    row.append(0)
+
+            print(row)
+            matrix.append(row)
+
+        print(matrix)
+        matrix_np = np.array(matrix)
+        print(matrix)
+        return matrix
+
 def punkt_im_radius(mp, radius, punkt):
     if l2metrik(mp, punkt) <= radius:
         return True
@@ -192,4 +211,4 @@ def schnittpunkt_ms(mi1, bi1, mi2, bi2):
 
 
 if __name__ == "__main__":
-    main()
+    matrix_mulitplikation()

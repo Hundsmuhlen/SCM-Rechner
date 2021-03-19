@@ -1,0 +1,42 @@
+{% extends "new_index.html"%}
+{% set active_page = "graph" %}
+
+{% block body %}
+
+<table class="table table-hover">
+    <h2>Gewichtete Distanzmatrix</h2>
+    <hr>
+    {% for row in results %}
+        {% if loop.index0 == 0 %}
+            <tr>
+            <th>Spaltensumme</th>
+            {% for col in row %}
+                <td>{{ col }}</td>
+            {% endfor %}
+            </tr>
+
+        {% elif loop.index0 == 1  %}
+            <tr>
+                <th>Spaltenmax</th>
+                {% for col in row %}
+                    <td>{{ col }}</td>
+                {% endfor %}
+            </tr>
+
+        {% else %}
+            {% for r in row %}
+                <tr>
+                    <th>{{ loop.index }}</th>
+                    {% for col in r %}
+                        <td>{{ col }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+         {% endif %}
+
+
+    {% endfor %}
+</table>
+
+
+{% endblock %}
