@@ -59,10 +59,19 @@
                 <th>Delta</th>
             </tr>
             {% for row in weiszfeld_results %}
+
+                {%  if loop.index == weiszfeld_results|length %}
+                    <tr class="table-success">
+                {% else %}
                     <tr>
+                {% endif %}
                         <th>{{ loop.index0 }}</th>
                         {% for i in row %}
+                            {%  if loop.index == weiszfeld_results.__len__ %}
+
+                            {% else %}
                                 <td>{{ i }}</td>
+                            {% endif %}
                         {% endfor %}
                     </tr>
             {% endfor %}
