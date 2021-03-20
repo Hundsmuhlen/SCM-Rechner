@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 from ScmTest2 import l2metrik, l8metrik, l22metrik, l1metrik, domKrit, schwerpunkt, entfernung, delta, weiszfeld
 from ScmTest3 import matrix_from_weights_vector
 import numpy as np
@@ -8,14 +8,9 @@ from flask import send_from_directory
 import os
 
 app = Flask(__name__)
+app.secret_key = "SCMistTollundmachtSpass-nicht"
 
 
-class state():
-    dimensions = 0
-    dimensions_set = False
-    amount_2d_points = 0
-    delta_nr = 0
-    graph_dimensions = None
 
 
 @app.route("/")
@@ -34,11 +29,11 @@ def graph_settings():
         return render_template("graph_settings.html")
     if request.method == "POST":
         try:
-            state.graph_dimensions = int(request.form.get("graph_dimensions"))
+            session["graph_dimensions"] = int(request.form.get("graph_dimensions"))
         except ValueError:
             return render_template("median_error.html", message="Du musst eine positive Anzahl an Punkten eingeben!")
 
-        return render_template("graph_input.html", dimensions=state.graph_dimensions)
+        return render_template("graph_input.html", dimensions=session["graph_dimensions"])
 
 @app.route("/graph-input", methods=["POST"])
 def graph_input():
@@ -50,13 +45,13 @@ def graph_input():
     matrix_max = []
     result = []
 
-    for i in range(state.graph_dimensions):
+    for i in range(session["graph_dimensions"]):
         weights_vector.append(float(request.form.get(f"w{i + 1}")))
     print(weights_vector)
 
-    for row in range(state.graph_dimensions):
+    for row in range(session["graph_dimensions"]):
         r = []
-        for col in range(state.graph_dimensions):
+        for col in range(session["graph_dimensions"]):
             r.append(float(request.form.get(f"{row + 1}{col + 1}")))
         dist_matrix.append(r)
 
@@ -70,7 +65,7 @@ def graph_input():
     result.append(np.asarray(weighted_matrix))
     print(result)
 
-
+    session.pop("graph_dimensions", None)
     return render_template("graph_results.html", results=result)
 
 
@@ -81,27 +76,27 @@ def median_settings():
         return render_template("median_settings.html")
     if request.method == "POST":
         try:
-            state.amount_2d_points = int(request.form.get("nr_of_points"))
+            session["median_amount_2d_points"] = int(request.form.get("nr_of_points"))
         except ValueError:
             return render_template("median_error.html", message="Du musst eine positive Anzahl an Punkten eingeben!")
 
         try:
 
-            state.delta_nr = float(request.form.get("weiszfeld_delta"))
-            print(state.delta_nr)
+            session["median_delta"] = float(request.form.get("weiszfeld_delta"))
+            print(f"Gewünschtes Delta: {session['median_delta']}")
         except ValueError:
-            state.delta_nr = 0
+            session["median_delta"] = 0
         except TypeError:
-            state.delta_nr = 0
+            session["median_delta"] = 0
 
-        return render_template("median_input.html", dimensions=state.amount_2d_points)
+        return render_template("median_input.html", dimensions=session["median_amount_2d_points"])
 
 
 @app.route("/median-input", methods=["GET", "POST"])
 def median_input():
     """
     Hier werden Schwerpunkt, verschärftes Dominanzkriterium und ein paar weiszfeld iterationen berechnet
-    dabei greifen wir auch auf den state zurück mit den 2d-points. Sind ja hier auch wieder 2d Punkte
+    dabei greifen wir auch auf die session zurück mit den 2d-points. Sind ja hier auch wieder 2d Punkte
     :return:
     """
     if request.method == "POST":
@@ -114,11 +109,11 @@ def median_input():
         weiszfeld_results = []
         show_weiszfeld = False
 
-        for i in range(state.amount_2d_points):
+        for i in range(session["median_amount_2d_points"]):
             weights.append(float(request.form.get(f"w{i + 1}")))
         print(weights)
 
-        for i in range(state.amount_2d_points):
+        for i in range(session["median_amount_2d_points"]):
             x = float(request.form[f"x{i + 1}"])
             y = float(request.form[f"y{i + 1}"])
             punkte.append(np.array([x, y]))
@@ -149,8 +144,8 @@ def median_input():
         # Platz für den Weizfeld
 
         print(f"Fulfilled Array: {fulfilled}")
-        print(f"State.delta = {state.delta_nr}")
-        if not any(fulfilled) and state.delta_nr > 0:
+        print(f"Session[median_delta] = {session['median_delta']}")
+        if not any(fulfilled) and session["median_delta"] > 0:
             print("weiszfeld wurde ausgelöst!!!")
             show_weiszfeld = True
             max_rounds = 10
@@ -162,7 +157,7 @@ def median_input():
             weiszfeld_results = []
             weiszfeld_results.append([x, fx, "---"])
 
-            while round_counter < max_rounds and d > state.delta_nr:
+            while round_counter < max_rounds and d > session["median_delta"]:
                 x_new = weiszfeld(weights=weights, punkte=punkte, xk=x)
                 fx_new = round(entfernung(weights, punkte, x_new, l2metrik), 4)
                 print(f"fx alt : {fx}, fx neu: {fx_new}, x neu: {x_new}, x alt: {x}")
@@ -185,7 +180,7 @@ def median_input():
                                punkte=punkte,
                                gamma=dominanzkriterium,
                                fulfilled=fulfilled,
-                               punktezahl=state.amount_2d_points,
+                               punktezahl=session["median_amount_2d_points"],
                                show_weiszfeld=show_weiszfeld,
                                weiszfeld_results=weiszfeld_results)
 
@@ -196,11 +191,11 @@ def metriken_multiple_points_settings():
         return render_template("metriken_multi_settings.html")
     if request.method == "POST":
         try:
-            state.amount_2d_points = int(request.form.get("nr_of_points"))
+            session["metriken_amount_2d_points"] = int(request.form.get("nr_of_points"))
         except ValueError:
             return render_template("metriken_multi_error.html",
                                    message="Du musst eine positive Anzahl an Punkten eingeben!")
-        return render_template("metriken_multi_input.html", dimensions=state.amount_2d_points)
+        return render_template("metriken_multi_input.html", dimensions=session["metriken_amount_2d_points"])
 
 
 @app.route("/metriken-multi-input", methods=["POST"])
@@ -209,7 +204,7 @@ def metriken_multi_points_input():
     two = []
     rows = []
 
-    for i in range(state.amount_2d_points):
+    for i in range(session["metriken_amount_2d_points"]):
         try:
             x = float(request.form.get(f"x{i + 1}"))
             y = float(request.form.get(f"y{i + 1}"))
@@ -246,14 +241,12 @@ def metriken_multi_points_input():
     return render_template("metriken_multi_results.html", rows=rows)
 
 
-@app.route("/metriken-dimensions", methods=["GET"])
-def metriken_dimensions():
-    return render_template("metriken_settings.html")
-
-
 @app.route("/metriken-settings", methods=["POST", "GET"])
 def metriken():
-    if request.method == "POST":
+
+    if request.method == "GET":
+        return render_template("metriken_settings.html")
+    else:
         try:
             dimensions = int(request.form.get("dimensions"))
         except ValueError:
@@ -261,7 +254,7 @@ def metriken():
         if dimensions < 1 or dimensions == None:
             return render_template("metriken_error.html", message="Have to have more than 0 dimensions!")
         else:
-            state.dimensions = dimensions
+            session["metriken_2_points_dimensions"] = dimensions
             return render_template("metriken_input.html", dimensions=dimensions)
 
 
@@ -270,7 +263,7 @@ def metriken_results():
     if request.method == "POST":
         l1 = []
         l2 = []
-        for i in range(state.dimensions):
+        for i in range(session["metriken_2_points_dimensions"]):
             try:
                 l1.append(float(request.form.get(f"a1{i}")))
             except ValueError:
@@ -300,11 +293,11 @@ def mp_und_rad():
         return render_template("mp_und_radius_settings.html")
     if request.method == "POST":
         try:
-            state.amount_2d_points = int(request.form.get("nr_of_points"))
+            session["m_u_r_amount_of_points"] = int(request.form.get("nr_of_points"))
         except ValueError:
             return render_template("mp_und_radius_error.html",
                                    message="Du musst eine positive Anzahl an Punkten eingeben!")
-        return render_template("mp_und_radius_input.html", dimensions=state.amount_2d_points)
+        return render_template("mp_und_radius_input.html", dimensions=session["m_u_r_amount_of_points"])
 
 
 @app.route("/mp-und-radius-input", methods=["POST", "GET"])
@@ -320,7 +313,7 @@ def mp_und_radius_input():
         rows = []
         minimal_überdeckender_kreis = []
 
-        for i in range(state.amount_2d_points):
+        for i in range(session["m_u_r_amount_of_points"]):
             try:
                 x = float(request.form.get(f"x{i + 1}"))
                 y = float(request.form.get(f"y{i + 1}"))
@@ -392,19 +385,7 @@ def mp_und_radius_input():
             except ValueError:
                 # Es gibt keinen Schnittpunkt der Achsen -> die Punkte liegen alle auf einer Achse
                 mp, radius = mp_und_radius_drei_auf_gleicher_achse(a, b, c)
-            # ---------------
-            # if a[1] == b[1] == c[1]:
-            #     possible_points = []
-            #     possible_points.append(mittelpunkt_und_radius(a, b))
-            #     possible_points.append(mittelpunkt_und_radius(a, c))
-            #     possible_points.append(mittelpunkt_und_radius(b, c))
-            #     mp, radius = max(possible_points, key=lambda item: item[1])
-            #
-            # mi1, bi1 = mittelsenkrechte(a, b)
-            # mi2, bi2 = mittelsenkrechte(a, c)
-            # x, y = schnittpunkt_ms(mi1, bi1, mi2, bi2)
-            # mp = np.array([x, y])
-            # radius = l2metrik(mp, a)
+
 
             row.append(np.round(mp, 4))
             row.append(round(radius, 4))
