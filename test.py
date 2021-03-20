@@ -19,6 +19,11 @@ max_rounds = 10
 d = 1
 delta_nr = 0.2
 
+dicti = {"we": 0}
+if "we" in dicti:
+    print("MOooooooooooooin")
+print(min([0]))
+
 while round_counter < max_rounds and d > delta_nr:
     round_counter += 1
     d = d / 2

@@ -8,9 +8,8 @@ from flask import send_from_directory
 import os
 
 app = Flask(__name__)
-app.secret_key = "SCMistTollundmachtSpass-nicht"
-
-
+# Hier sollte eigentlich eine geheime Phrase stehen. Ich hab einfach mal das absurdeste genommen, was mir eingefallen ist
+app.secret_key = "SCMistTollundmachtSpass"
 
 
 @app.route("/")
@@ -34,6 +33,7 @@ def graph_settings():
             return render_template("median_error.html", message="Du musst eine positive Anzahl an Punkten eingeben!")
 
         return render_template("graph_input.html", dimensions=session["graph_dimensions"])
+
 
 @app.route("/graph-input", methods=["POST"])
 def graph_input():
@@ -69,7 +69,6 @@ def graph_input():
     return render_template("graph_results.html", results=result)
 
 
-
 @app.route("/median-settings", methods=["GET", "POST"])
 def median_settings():
     if request.method == "GET":
@@ -81,13 +80,23 @@ def median_settings():
             return render_template("median_error.html", message="Du musst eine positive Anzahl an Punkten eingeben!")
 
         try:
-
             session["median_delta"] = float(request.form.get("weiszfeld_delta"))
             print(f"Gewünschtes Delta: {session['median_delta']}")
         except ValueError:
             session["median_delta"] = 0
         except TypeError:
             session["median_delta"] = 0
+
+        try:
+            #todo
+            x = float(request.form.get("weiszfeld_start_x"))
+            y = float(request.form.get("weiszfeld_start_y"))
+            session["weiszfeld_startpunkt"] = np.array([x,y])
+        except ValueError:
+            print("No alternative starting Point")
+        except TypeError:
+            print("No alternative starting Point")
+
 
         return render_template("median_input.html", dimensions=session["median_amount_2d_points"])
 
@@ -151,11 +160,15 @@ def median_input():
             max_rounds = 10
             round_counter = 0
             d = 1
+            x = None
 
-            x = sp
-            fx = round(entfernung(weights, punkte, sp, l2metrik), 4)
-            weiszfeld_results = []
-            weiszfeld_results.append([x, fx, "---"])
+            if "weiszfeld_startpunkt" in session:
+                x = session["weiszfeld_startpunkt"]
+            else:
+                x = sp
+
+            fx = round(entfernung(weights, punkte, x, l2metrik), 4)
+            weiszfeld_results = [[x, fx, "---"]]
 
             while round_counter < max_rounds and d > session["median_delta"]:
                 x_new = weiszfeld(weights=weights, punkte=punkte, xk=x)
@@ -243,7 +256,6 @@ def metriken_multi_points_input():
 
 @app.route("/metriken-settings", methods=["POST", "GET"])
 def metriken():
-
     if request.method == "GET":
         return render_template("metriken_settings.html")
     else:
@@ -385,7 +397,6 @@ def mp_und_radius_input():
             except ValueError:
                 # Es gibt keinen Schnittpunkt der Achsen -> die Punkte liegen alle auf einer Achse
                 mp, radius = mp_und_radius_drei_auf_gleicher_achse(a, b, c)
-
 
             row.append(np.round(mp, 4))
             row.append(round(radius, 4))
