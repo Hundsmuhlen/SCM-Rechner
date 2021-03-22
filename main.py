@@ -92,7 +92,7 @@ def median_settings():
             #todo
             x = float(request.form.get("weiszfeld_start_x"))
             y = float(request.form.get("weiszfeld_start_y"))
-            session["weiszfeld_startpunkt"] = np.array([x,y])
+            session["weiszfeld_startpunkt"] = [x,y]
         except ValueError:
             print("No alternative starting Point")
         except TypeError:
