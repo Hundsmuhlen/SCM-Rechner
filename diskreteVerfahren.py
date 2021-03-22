@@ -2,7 +2,7 @@ import numpy as np
 
 
 def dual_ascent(cost_array, fixcosts):
-    # input_array = [
+    # costMatrix = [
     #     [0, 4, 6, 12, 3],
     #     [2, 6, 3, 4, 0],
     #     [4, 9, 10, 12, 8],
@@ -12,7 +12,7 @@ def dual_ascent(cost_array, fixcosts):
     # ]
     #
     # F = [12, 6, 9, 9, 12]  # Kosten für Eröffnung
-    #
+
 
     costMatrix = cost_array
     F = fixcosts
@@ -136,7 +136,55 @@ def dual_ascent(cost_array, fixcosts):
         print(f"vi = {vi}")
         print(f"Ji = {Ji}")
         print(f"sj = {sj}")
+
+
+
     return vi, Ji, sj
+
+
+def alles_zu_grosser_matrix(costMatrix, sj, vi, Ji):
+    result = costMatrix
+
+    vi_sum = [sum(v) for v in vi]
+    # for v in vi_sum:
+    #     vi.append(v)
+    #     Ji.append("-")
+
+    ji_vi = []
+    for v, j in zip(vi, Ji):
+        ji_vi.append(v)
+        ji_vi.append(j)
+
+    #ji_vi transponieren
+    # ji_vi_transponiert = np.asarray(np.array(ji_vi).T)
+    ji_vi_transponiert =[]
+
+    for i in range(len(ji_vi[0])):
+        col = []
+        for jv in ji_vi:
+            try:
+                print(jv[i])
+                col.append(jv[i])
+            except IndexError:
+                pass
+        ji_vi_transponiert.append(col)
+
+    print("Transponation - Vorher:")
+    print(ji_vi)
+    print("----------- Nachher ------------")
+    print(ji_vi_transponiert)
+
+    result.append(["-" for _ in range(len(costMatrix[0]))])
+    for v in vi_sum:
+        result[-1].append(v)
+        result[-1].append("-")
+
+    for row, row_jivi in zip(result, ji_vi_transponiert):
+        row.extend(row_jivi)
+
+    result.extend(sj)
+    print(result)
+    return result
 
 
 def greedy():

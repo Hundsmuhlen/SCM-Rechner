@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, session
 from ScmTest2 import l2metrik, l8metrik, l22metrik, l1metrik, domKrit, schwerpunkt, entfernung, delta, weiszfeld
 from ScmTest3 import matrix_from_weights_vector
+from diskreteVerfahren import greedy, dual_ascent, alles_zu_grosser_matrix
 import numpy as np
 import re
 from itertools import combinations
@@ -416,6 +417,48 @@ def mp_und_radius_input():
                 # print("ValueError bei Checken der Ergebnisse")
                 pass
         return render_template("mp_und_radius_results.html", rows=rows, muek=minimal_überdeckender_kreis)
+
+
+@app.route("/diskrete-settings", methods=["GET", "POST"])
+def diskrete_settings():
+    if request.method == "GET":
+        return render_template("diskrete_settings.html")
+    else:
+        try:
+            nr_of_j = int(request.form.get("nr_of_j"))
+            nr_of_i = int(request.form.get("nr_of_i"))
+        except ValueError:
+            return render_template("diskrete_error.html", message="You have to enter the wanted dimensions!")
+        if nr_of_j < 1 or nr_of_j is None or nr_of_i < 1 or nr_of_i is None:
+            return render_template("diskrete_error.html", message="Have to have more than 0 dimensions!")
+        else:
+            session["nr_of_j"] = nr_of_j
+            session["nr_of_i"] = nr_of_i
+            return render_template("diskrete_input.html", nr_of_i=nr_of_i, nr_of_j=nr_of_j)
+
+@app.route("/diskrete-input", methods=["POST"])
+def diskrete_input():
+    weights_vector = []
+    dist_matrix = []
+
+    for i in range(session["nr_of_j"]):
+        weights_vector.append(float(request.form.get(f"w{i + 1}")))
+    print(weights_vector)
+
+    for row in range(session["nr_of_i"]):
+        r = []
+        for col in range(session["nr_of_j"]):
+            r.append(float(request.form.get(f"{row + 1}{col + 1}")))
+        dist_matrix.append(r)
+
+    vi, Ji, sj = dual_ascent(cost_array=dist_matrix, fixcosts=weights_vector)
+
+    result_matrix = alles_zu_grosser_matrix(costMatrix=dist_matrix, sj=sj, vi=vi, Ji=Ji)
+
+
+    # session.pop("nr_of_j", None)
+    # session.pop("nr_of_i", None)
+    return render_template("diskrete_results.html", results=result_matrix)
 
 
 @app.route("/impressum", methods=["GET"])

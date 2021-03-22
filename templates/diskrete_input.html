@@ -1,0 +1,36 @@
+{% extends "new_index.html"%}
+{% set active_page = "diskrete" %}
+
+{% block body %}
+<form method="post" action="/diskrete-input" class="mx-auto">
+    <h2>Distanzmatrix:</h2>
+    <br>
+    <hr>
+    {% for row in range(nr_of_i)%}
+    <div class="row gx-5 gy-5 mx-auto">
+            {% for col in range(nr_of_j) %}
+              <div class="col-2">
+                <input type="text" class="form-control mb-1" placeholder="i {{ row + 1 }} - j {{ col + 1 }}"  name="{{ row + 1 }}{{ col + 1 }}" autofocus>
+              </div>
+            {% endfor %}
+    </div>
+    {% endfor %}
+
+    <br>
+    <h2>Gewichte der einzelnen Punkte</h2>
+    <br>
+    <hr>
+
+    {% for weight in range(nr_of_j) %}
+    <div class="row gx-5 gy-5 mx-auto">
+              <div class="col-2">
+                <input type="text" class="form-control mb-1" placeholder="Gewicht Punkt {{ weight + 1 }}"  name="w{{ weight + 1}}" autofocus>
+              </div>
+    </div>
+    {% endfor %}
+    <div class="col-4 mx-auto">
+         <button class="btn btn-primary" type="submit">Submit </button>
+    </div>
+</form>
+
+{% endblock %}
