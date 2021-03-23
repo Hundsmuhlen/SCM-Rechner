@@ -60,8 +60,8 @@ def delta(k, k1):
 def l1_zu_l8_transformation(punkte):
     result = []
     matrix = np.array([[1, -1], [1, 1]])
-    # if type(punkte) is not list:
-    #     punkte = [punkte]
+    if type(punkte) is not list:
+        punkte = [punkte]
 
     for punkt in punkte:
         p = np.array(punkt)
@@ -71,8 +71,8 @@ def l1_zu_l8_transformation(punkte):
 def l8_zu_l1_transformation(punkte:list):
     result = []
     matrix = np.array([[0.5, 0.5], [-0.5, 0.5]])
-    # if type(punkte) is not list:
-    #     punkte = [punkte]
+    if type(punkte) is not list:
+        punkte = [punkte]
 
     for punkt in punkte:
         p = np.array(punkt)
@@ -92,20 +92,28 @@ def l8_center_ungewichtet(punkte):
     return unten_links, oben_rechts, delta_x, delta_y, quadrat(delta_x, delta_y), mittelpunkt
 
 def l8_center_gewichtet_eindimensional(weights, ein_d_punkte):
-    delta_ij = lambda wi, ai, wj, aj: ((wi*wj)/(wi+wj))*abs(aj-ai)
-    combis = combinations([i for i in range(len(ein_d_punkte))])
+
+    delta_ij = lambda wi, ai, wj, aj: float(((wi*wj)/(wi+wj))*abs(aj-ai))
+    indizes = [i for i in range(len(ein_d_punkte))]
+    combis = [i for i in combinations(indizes, 2)]
+    combis_of_actual_points = [[ein_d_punkte[i[0]], ein_d_punkte[i[1]]] for i in combis]
 
 
     delta_list = []
     #delta list hat die gleiche Reihenfolge wie die Liste der möglichen Kombinationen -> deswegen über index auffindbar
     for combi in combis:
+        #es sind die kombinierten indizes
         i = combi[0]
         j = combi[1]
         d = delta_ij(weights[i], ein_d_punkte[i], weights[j], ein_d_punkte[j])
         delta_list.append(d)
 
+    print(combis)
+    print("--------------")
+
 
     delta_max = max(delta_list)
+    print(f"Index of delta max = {delta_list.index(delta_max)}")
     combi_of_delta_max = combis[delta_list.index(delta_max)]
     p = combi_of_delta_max[0]
     q = combi_of_delta_max[1]
@@ -114,7 +122,7 @@ def l8_center_gewichtet_eindimensional(weights, ein_d_punkte):
 
     x_stern = opt_punkt(weights[p], ein_d_punkte[p], weights[q], ein_d_punkte[q])
 
-    return delta_list, delta_max, combi_of_delta_max, x_stern
+    return combis_of_actual_points, delta_list, delta_max, combi_of_delta_max, x_stern
 
 def schwerpunkt(weights,punkte):
     zähler = sum([w*p for w,p in zip(weights, punkte)])

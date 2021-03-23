@@ -43,6 +43,10 @@ print(asdf[letzte])
 
 punkt = [1,4]
 
+print("-------")
+print(asdf[:2])
+print(asdf[2:])
+
 while round_counter < max_rounds and d > delta_nr:
     round_counter += 1
     d = d / 2

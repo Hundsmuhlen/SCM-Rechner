@@ -3,6 +3,16 @@
 
 {% block body %}
     <h3>{{ heading }}</h3>
+
+    {% if warning  %}
+        <br>
+        <div class="alert alert-warning" role="alert">
+            Aktuell noch in der Erprobungsphase, die Ergebnisse könnten teilweise noch nicht stimmen! <br>
+        </div>
+        <br>
+    {% endif %}
+
+    <hr>
     {{ inhalt }}
     <hr>
 <form method="post" action="{{ url_to_post_to }}" class="form-inline">

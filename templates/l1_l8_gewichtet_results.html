@@ -1,0 +1,51 @@
+{% extends "new_index.html"%}
+{% set active_page = "l1-l8-center" %}
+
+{% block body %}
+    <h2>Ergenisse</h2>
+    <b></b>
+    <table class="table">
+        <tr>
+            <th>Delta ij max für x Koordinaten:</th>
+            <th>Zugehörige Kombination x:</th>
+            <th>Delta ij max für y Koordinaten:</th>
+            <th>Zugehörige Kombination x:</th>
+            <th>X* in L-Unendlich Metrik</th>
+            <th>Y* in L-Unendlich Metrik</th>
+            {% if l1_chosen %}
+                <th>X* zurück Transformiert</th>
+                <th>Y* zurück Transformiert</th>
+            {% endif %}
+        </tr>
+        <tr>
+            <td>{{ x_delta_max }}</td>
+            <td>{{ x_combi_of_delta_max }}</td>
+            <td>{{ y_delta_max }}</td>
+            <td>{{ y_combi_of_delta_max }}</td>
+            <td>{{ x_stern }}</td>
+            <td>{{ y_stern }}</td>
+            {% if l1_chosen %}
+                <td>{{ x_stern_t }}</td>
+                <td>{{ y_stern_t }}</td>
+            {% endif %}
+        </tr>
+    </table>
+
+    <table class="table">
+        <tr>
+            <th>Punktkombination ij</th>
+            <th>Delta ij für x Wert</th>
+            <th>Delta ij für y Wert</th>
+
+        </tr>
+            {% for i in range(combi_len) %}
+                <tr>
+                    <td>{{ combis[i] }}</td>
+                    <td>{{ x_delta_list[i] }}</td>
+                    <td>{{ y_delta_list[i] }}</td>
+                </tr>
+            {% endfor %}
+
+    </table>
+
+{% endblock %}

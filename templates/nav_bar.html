@@ -3,14 +3,14 @@
 
 {% block navbar %}
 
-
     {% set navigation_bar = [
         ('/', 'index', 'Home'),
         ("/metriken-multi-settings", "metriken-multi", "Metrikenrechner"),
-        ('/mittelpunkt-und-radius', 'mp-und-radius', 'Mittelpunkt & MÜK'),
-        ("/graph-settings", "graph", "Graphen"),
-        ('/median-settings', "median", "Median Probleme"),
-        ("/diskrete-settings", "diskrete", "Dual Ascend"),
+        ('/mittelpunkt-und-radius', 'mp-und-radius', 'Ebene - Center - L1 - MÜK'),
+        ("/l1-l8-center-settings", "l1-l8-center", "Ebene - Center - L1 L∞"),
+        ('/median-settings', "median", "Ebene - Median - L2, L2²"),
+        ("/graph-settings", "graph", "Netwerk - Center & Median"),
+        ("/diskrete-settings", "diskrete", "Diskret - Dual Ascent"),
         ('/impressum', 'impressum', 'Impressum & Mithelfen')
     ] -%}
         {% set active_page = active_page|default('index') -%}

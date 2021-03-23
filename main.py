@@ -425,9 +425,10 @@ def mp_und_radius_input():
 def l1_l8_center_settings():
     if request.method == "GET":
         return render_template("anzahl_punkte_template.html",
-                               page="l1_l8_center",
+                               page="l1-l8-center",
                                heading="L1 und L-Unendlich Centerprobleme",
                                inhalt="Entscheide im nächsten Schritt, ob du die l1 oder l unendlich Metrik willst",
+                               warning=True,
                                name_of_input="l1_l8_center_amount_points")
     if request.method == "POST":
         try:
@@ -447,14 +448,11 @@ def l1_l8_center_input():
 
     for i in range(session["l1_l8_center_amount_points"]):
         try:
-            weights.append(float(request.form.get(f"w{i + 1}")))
-        except ValueError or TypeError:
-            pass
+            weights.append(float(request.form[f"w{i + 1}"]))
+        except Exception as e:
+            print(e)
 
-    if len(weights) != len(punkte):
-        return render_template("error_template.html", page="l1-l8-center", message="Eingabefehler! Gleich viele Gewichte und Punkte eingeben")
     print("weights eingelesen")
-    print(weights)
 
     for i in range(session["l1_l8_center_amount_points"]):
         try:
@@ -465,6 +463,10 @@ def l1_l8_center_input():
             return render_template("error_template.html", page="l1-l8-center",
                                    message="Du musst für alle Punkte Werte eigeben.\n "
                                            "Verwende Punkte statt Kommas! - ValueError")
+
+    if len(weights) != len(punkte):
+        return render_template("error_template.html", page="l1-l8-center",
+                               message="Eingabefehler! Gleich viele Gewichte und Punkte eingeben")
     print("x und y eingelesen")
 
     if request.form["l1-or-l8"] == "l1":
@@ -477,7 +479,7 @@ def l1_l8_center_input():
         print("L unendlich Metrik ausgewählt")
 
     if len(weights) == 0:
-        #ungewichteter Fall:
+        # ungewichteter Fall:
         unten_links, oben_rechts, delta_x, delta_y, quadrat, mittelpunkt = l8_center_ungewichtet(transformierte_punkte)
         unten_links_t = l8_zu_l1_transformation([unten_links])
         oben_rechts_t = l8_zu_l1_transformation([oben_rechts])
@@ -499,9 +501,33 @@ def l1_l8_center_input():
                                mittelpunkt_t=np.asarray(mittelpunkt_t)[0])
 
     else:
-        #todo
-        pass
+        x_punkte = [punkt[0] for punkt in transformierte_punkte]
+        y_punkte = [punkt[1] for punkt in transformierte_punkte]
 
+        combis, x_delta_list, x_delta_max, x_combi_of_delta_max, x_stern = l8_center_gewichtet_eindimensional(weights,
+                                                                                                              x_punkte)
+        combis2, y_delta_list, y_delta_max, y_combi_of_delta_max, y_stern = l8_center_gewichtet_eindimensional(weights, y_punkte)
+
+        x_y_stern_t = l8_zu_l1_transformation([[x_stern,y_stern]])
+
+
+        return render_template("l1_l8_gewichtet_results.html",
+                               combi_len=len(combis),
+                               combis=combis,
+                               x_delta_list=x_delta_list,
+                               y_delta_list=y_delta_list,
+                               x_delta_max=x_delta_max,
+                               x_combi_of_delta_max=x_combi_of_delta_max,
+                               x_stern=x_stern,
+                               y_stern=y_stern,
+                               y_delta_max=y_delta_max,
+                               y_combi_of_delta_max=y_combi_of_delta_max,
+                               l1_chosen=l1_metrik_chosen,
+                               x_stern_t=np.asarray(x_y_stern_t)[0][0],
+                               y_stern_t=np.asarray(x_y_stern_t)[0][1]
+                               )
+
+        pass
 
 
 @app.route("/diskrete-settings", methods=["GET", "POST"])

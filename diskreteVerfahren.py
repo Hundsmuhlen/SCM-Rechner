@@ -142,8 +142,9 @@ def dual_ascent(cost_array, fixcosts):
     return vi, Ji, sj
 
 
-def dual_ascent_zu_grosser_matrix(costMatrix, sj, vi, Ji):
+def dual_ascent_zu_grosser_matrix(costMatrix, sj:list, vi, Ji):
     result = costMatrix
+    amount_of_i = len(vi[0])
 
     vi_sum = [sum(v) for v in vi]
     # for v in vi_sum:
@@ -181,6 +182,16 @@ def dual_ascent_zu_grosser_matrix(costMatrix, sj, vi, Ji):
 
     for row, row_jivi in zip(result, ji_vi_transponiert):
         row.extend(row_jivi)
+
+    sj_trenner = ["-" for _ in range(len(sj[0]))]
+
+    # Striche zum besseren Trennen in sj einziehen:
+    sj.insert(1, sj_trenner)
+
+    i = amount_of_i + 2
+    while i < len(sj):
+        sj.insert(i, sj_trenner)
+        i += (amount_of_i + 1)
 
     result.extend(sj)
     print(result)
