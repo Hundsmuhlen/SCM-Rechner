@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, session
-from ScmTest2 import l2metrik, l8metrik, l22metrik, l1metrik, domKrit, schwerpunkt, entfernung, delta, weiszfeld
+from ScmTest2 import l2metrik, l8metrik, l22metrik, l1metrik, domKrit, schwerpunkt, entfernung, delta, weiszfeld, \
+    l8_center_gewichtet_eindimensional, l1_zu_l8_transformation, l8_center_ungewichtet, l8_zu_l1_transformation
 from ScmTest3 import matrix_from_weights_vector
-from diskreteVerfahren import greedy, dual_ascent, alles_zu_grosser_matrix
+from diskreteVerfahren import greedy, dual_ascent, dual_ascent_zu_grosser_matrix
 import numpy as np
 import re
 from itertools import combinations
@@ -89,15 +90,14 @@ def median_settings():
             session["median_delta"] = 0
 
         try:
-            #todo
+            # todo
             x = float(request.form.get("weiszfeld_start_x"))
             y = float(request.form.get("weiszfeld_start_y"))
-            session["weiszfeld_startpunkt"] = [x,y]
+            session["weiszfeld_startpunkt"] = [x, y]
         except ValueError:
             print("No alternative starting Point")
         except TypeError:
             print("No alternative starting Point")
-
 
         return render_template("median_input.html", dimensions=session["median_amount_2d_points"])
 
@@ -165,6 +165,7 @@ def median_input():
 
             if "weiszfeld_startpunkt" in session:
                 x = session["weiszfeld_startpunkt"]
+
             else:
                 x = sp
 
@@ -187,6 +188,7 @@ def median_input():
 
                 round_counter += 1
 
+        session.pop("weiszfeld_startpunkt", None)
         return render_template("median_results.html",
                                schwerpunkt=sp,
                                entfernungen=entfernungen,
@@ -419,6 +421,89 @@ def mp_und_radius_input():
         return render_template("mp_und_radius_results.html", rows=rows, muek=minimal_überdeckender_kreis)
 
 
+@app.route("/l1-l8-center-settings", methods=["POST", "GET"])
+def l1_l8_center_settings():
+    if request.method == "GET":
+        return render_template("anzahl_punkte_template.html",
+                               page="l1_l8_center",
+                               heading="L1 und L-Unendlich Centerprobleme",
+                               inhalt="Entscheide im nächsten Schritt, ob du die l1 oder l unendlich Metrik willst",
+                               name_of_input="l1_l8_center_amount_points")
+    if request.method == "POST":
+        try:
+            session["l1_l8_center_amount_points"] = int(request.form.get("l1_l8_center_amount_points"))
+        except ValueError:
+            return render_template("median_error.html", message="Du musst eine positive Anzahl an Punkten eingeben!")
+
+        return render_template("l1_l8_center_input.html", dimensions=session["l1_l8_center_amount_points"])
+
+
+@app.route("/l1-l8-center-input", methods=["POST"])
+def l1_l8_center_input():
+    weights = []
+    punkte = []
+    transformierte_punkte = []
+    l1_metrik_chosen = True
+
+    for i in range(session["l1_l8_center_amount_points"]):
+        try:
+            weights.append(float(request.form.get(f"w{i + 1}")))
+        except ValueError or TypeError:
+            pass
+
+    if len(weights) != len(punkte):
+        return render_template("error_template.html", page="l1-l8-center", message="Eingabefehler! Gleich viele Gewichte und Punkte eingeben")
+    print("weights eingelesen")
+    print(weights)
+
+    for i in range(session["l1_l8_center_amount_points"]):
+        try:
+            x = float(request.form[f"x{i + 1}"])
+            y = float(request.form[f"y{i + 1}"])
+            punkte.append(np.array([x, y]))
+        except ValueError or TypeError:
+            return render_template("error_template.html", page="l1-l8-center",
+                                   message="Du musst für alle Punkte Werte eigeben.\n "
+                                           "Verwende Punkte statt Kommas! - ValueError")
+    print("x und y eingelesen")
+
+    if request.form["l1-or-l8"] == "l1":
+        l1_metrik_chosen = True
+        transformierte_punkte = l1_zu_l8_transformation(punkte)
+        print("L1 Metrik ausgewählt")
+    else:
+        l1_metrik_chosen = False
+        transformierte_punkte = punkte.copy()
+        print("L unendlich Metrik ausgewählt")
+
+    if len(weights) == 0:
+        #ungewichteter Fall:
+        unten_links, oben_rechts, delta_x, delta_y, quadrat, mittelpunkt = l8_center_ungewichtet(transformierte_punkte)
+        unten_links_t = l8_zu_l1_transformation([unten_links])
+        oben_rechts_t = l8_zu_l1_transformation([oben_rechts])
+        mittelpunkt_t = l8_zu_l1_transformation([mittelpunkt])
+
+        return render_template("l1_l8_ungewichtet_results.html",
+                               unten_links=unten_links,
+                               oben_rechts=oben_rechts,
+                               delta_x=delta_x,
+                               delta_y=delta_y,
+                               quadrat=quadrat,
+                               mittelpunkt=mittelpunkt,
+                               l1_chosen=l1_metrik_chosen,
+                               unten_links_t=np.asarray(unten_links_t)[0],
+                               oben_rechts_t=np.asarray(oben_rechts_t)[0],
+                               delta_x_t="gilt nur für l unendlich",
+                               delta_y_t="gilt nur für l unendlich",
+                               quadrat_t="gilt nur für l unendlich",
+                               mittelpunkt_t=np.asarray(mittelpunkt_t)[0])
+
+    else:
+        #todo
+        pass
+
+
+
 @app.route("/diskrete-settings", methods=["GET", "POST"])
 def diskrete_settings():
     if request.method == "GET":
@@ -435,6 +520,7 @@ def diskrete_settings():
             session["nr_of_j"] = nr_of_j
             session["nr_of_i"] = nr_of_i
             return render_template("diskrete_input.html", nr_of_i=nr_of_i, nr_of_j=nr_of_j)
+
 
 @app.route("/diskrete-input", methods=["POST"])
 def diskrete_input():
@@ -453,8 +539,7 @@ def diskrete_input():
 
     vi, Ji, sj = dual_ascent(cost_array=dist_matrix, fixcosts=weights_vector)
 
-    result_matrix = alles_zu_grosser_matrix(costMatrix=dist_matrix, sj=sj, vi=vi, Ji=Ji)
-
+    result_matrix = dual_ascent_zu_grosser_matrix(costMatrix=dist_matrix, sj=sj, vi=vi, Ji=Ji)
 
     # session.pop("nr_of_j", None)
     # session.pop("nr_of_i", None)

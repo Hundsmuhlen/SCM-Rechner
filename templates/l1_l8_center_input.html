@@ -1,0 +1,49 @@
+{% extends "new_index.html"%}
+{% set active_page = "l1-l8-center" %}
+
+{% block body %}
+    <h2>Punkte eintragen</h2>
+    <b>Wenn du den ungewichteten Fall haben willst, lass die Gewichte einfach frei! </b>
+    <br>
+    <hr>
+    <br>
+<form method="post" action="/l1-l8-center-input" class="mx-auto">
+    {% for i in range(dimensions)%}
+    <div class="row gx-5 gy-5 mx-auto">
+              <div class="col-2">
+                <input type="text" class="form-control mb-1" placeholder="{{i+1}}. Vektor Gewicht"  name="w{{i+1}}" autofocus>
+              </div>
+              <div class="col-2">
+                <input type="text" class="form-control mb-1" placeholder="{{i+1}}. Vektor X-Wert"  name="x{{i+1}}">
+              </div>
+              <div class="col-2">
+                <input type="text" class="form-control mb-1" placeholder="{{i+1}}. Vektor Y-Wert"  name="y{{i+1}}">
+              </div>
+    </div>
+    {% endfor %}
+    <div class="col-4 mx-auto">
+         <button class="btn btn-primary" type="submit">Submit </button>
+    </div>
+
+
+    <hr>
+    <h4>Entscheide dich, welche Metrik du verwenden willst:</h4>
+
+
+
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="l1-or-l8" id="exampleRadios1" value="l1" checked>
+        <label class="form-check-label" for="exampleRadios1">
+            L1 Metrik
+        </label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="l1-or-l8" id="exampleRadios2" value="l8">
+        <label class="form-check-label" for="exampleRadios2">
+            L unendlich Metrik
+        </label>
+    </div>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "new_index.html"%}
+{% set active_page = "l1-l8-center" %}
+
+{% block body %}
+    <table class="table">
+        <tr>
+            <th>Anmerkungen</th>
+            <th>Unten Links</th>
+            <th>Oben Rechts</th>
+            <th>Länge Kante x-Koordinaten - Delta x</th>
+            <th>Länge Kante y-Koordinaten - Delta y</th>
+            <th>Ist es ein quadrat?</th>
+            <th>Mittelpunkt</th>
+
+        </tr>
+        <tr>
+            <td>L unendlich Metrik</td>
+            <td>{{ unten_links }}</td>
+            <td>{{ oben_rechts }}</td>
+            <td>{{ delta_x }}</td>
+            <td>{{ delta_y }}</td>
+            <td>{{ quadrat }}</td>
+            <td>{{ mittelpunkt }}</td>
+        </tr>
+        {% if l1_chosen %}
+            <td>L1 Metrik - Transformiert</td>
+            <td>{{ unten_links_t }}</td>
+            <td>{{ oben_rechts_t }}</td>
+            <td>{{ delta_x_t }}</td>
+            <td>{{ delta_y_t }}</td>
+            <td>{{ quadrat_t }}</td>
+            <td>{{ mittelpunkt_t }}</td>
+        {% endif %}
+    </table>
+
+{% endblock %}

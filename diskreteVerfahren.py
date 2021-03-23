@@ -142,7 +142,7 @@ def dual_ascent(cost_array, fixcosts):
     return vi, Ji, sj
 
 
-def alles_zu_grosser_matrix(costMatrix, sj, vi, Ji):
+def dual_ascent_zu_grosser_matrix(costMatrix, sj, vi, Ji):
     result = costMatrix
 
     vi_sum = [sum(v) for v in vi]
@@ -186,6 +186,11 @@ def alles_zu_grosser_matrix(costMatrix, sj, vi, Ji):
     print(result)
     return result
 
+
+def greedy_zu_einer_matrix(costMatrix, wj, delta, ui):
+    result = costMatrix
+
+    pass
 
 def greedy():
     input_array2 = [

@@ -41,6 +41,7 @@ letzte = -1
 asdf = [1,2,3,4]
 print(asdf[letzte])
 
+punkt = [1,4]
 
 while round_counter < max_rounds and d > delta_nr:
     round_counter += 1

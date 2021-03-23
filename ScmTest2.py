@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import numpy_ml as npml
+from itertools import combinations
 
 def l2metrik(a,b):
     # print(a)
@@ -51,10 +52,69 @@ def delta(k, k1):
     """
 
     :param k: f(xk)
-    :param k1: f(xk+1) - also dem x k+1, also dem neueren
+    :param k1: f(xk+1)-
     :return:
     """
     return ((k-k1)/k)
+
+def l1_zu_l8_transformation(punkte):
+    result = []
+    matrix = np.array([[1, -1], [1, 1]])
+    # if type(punkte) is not list:
+    #     punkte = [punkte]
+
+    for punkt in punkte:
+        p = np.array(punkt)
+        result.append(np.matmul(p, matrix))
+    return result
+
+def l8_zu_l1_transformation(punkte:list):
+    result = []
+    matrix = np.array([[0.5, 0.5], [-0.5, 0.5]])
+    # if type(punkte) is not list:
+    #     punkte = [punkte]
+
+    for punkt in punkte:
+        p = np.array(punkt)
+        result.append(np.matmul(p, matrix))
+    return result
+
+def l8_center_ungewichtet(punkte):
+    all_x = [punkt[0] for punkt in punkte]
+    all_y = [punkt[1] for punkt in punkte]
+    unten_links = [min(all_x), min(all_y)]
+    oben_rechts = [max(all_x), max(all_y)]
+    delta_x = oben_rechts[0] - unten_links[0]
+    delta_y = oben_rechts[1] - unten_links[0]
+    quadrat = lambda dx, dy: dx == dy
+    mittelpunkt = [unten_links[0] + delta_x/2, unten_links[1] + delta_y/2]
+
+    return unten_links, oben_rechts, delta_x, delta_y, quadrat(delta_x, delta_y), mittelpunkt
+
+def l8_center_gewichtet_eindimensional(weights, ein_d_punkte):
+    delta_ij = lambda wi, ai, wj, aj: ((wi*wj)/(wi+wj))*abs(aj-ai)
+    combis = combinations([i for i in range(len(ein_d_punkte))])
+
+
+    delta_list = []
+    #delta list hat die gleiche Reihenfolge wie die Liste der möglichen Kombinationen -> deswegen über index auffindbar
+    for combi in combis:
+        i = combi[0]
+        j = combi[1]
+        d = delta_ij(weights[i], ein_d_punkte[i], weights[j], ein_d_punkte[j])
+        delta_list.append(d)
+
+
+    delta_max = max(delta_list)
+    combi_of_delta_max = combis[delta_list.index(delta_max)]
+    p = combi_of_delta_max[0]
+    q = combi_of_delta_max[1]
+
+    opt_punkt = lambda wp,ap,wq,aq: (wp*ap+wq*aq)/(wp+wq)
+
+    x_stern = opt_punkt(weights[p], ein_d_punkte[p], weights[q], ein_d_punkte[q])
+
+    return delta_list, delta_max, combi_of_delta_max, x_stern
 
 def schwerpunkt(weights,punkte):
     zähler = sum([w*p for w,p in zip(weights, punkte)])
