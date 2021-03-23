@@ -4,12 +4,12 @@
 {% block body %}
 <form method="post" action="/mp-und-radius-input" class="mx-auto">
     {% for i in range(dimensions)%}
-    <div class="row gx-5 gy-5 mx-auto">
-              <div class="col-2">
-                <input type="text" class="form-control mb-1" placeholder="{{i+1}}. Vektor X-Wert"  name="x{{i+1}}" autofocus>
+    <div class="row justify-content-center gx-1 gy-1 mx-auto">
+              <div class="col-4">
+                <input type="text" class="form-control mb-2" placeholder="{{i+1}}. Vektor X-Wert"  name="x{{i+1}}" autofocus>
               </div>
-              <div class="col-2">
-                <input type="text" class="form-control mb-1" placeholder="{{i+1}}. Vektor Y-Wert"  name="y{{i+1}}">
+              <div class="col-4">
+                <input type="text" class="form-control mb-2" placeholder="{{i+1}}. Vektor Y-Wert"  name="y{{i+1}}">
               </div>
     </div>
     {% endfor %}

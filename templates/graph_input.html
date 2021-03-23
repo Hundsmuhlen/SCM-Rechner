@@ -7,9 +7,9 @@
     <br>
     <hr>
     {% for row in range(dimensions)%}
-    <div class="row gx-5 gy-5 mx-auto">
+    <div class="row gx-1 gy-1 mx-auto">
             {% for col in range(dimensions) %}
-              <div class="col-2">
+              <div class="col">
                 <input type="text" class="form-control mb-1" placeholder="Zeile {{ row + 1 }} - Spalte {{ col + 1 }}"  name="{{ row + 1 }}{{ col + 1 }}" autofocus>
               </div>
             {% endfor %}
@@ -22,8 +22,8 @@
     <hr>
 
     {% for weight in range(dimensions) %}
-    <div class="row gx-5 gy-5 mx-auto">
-              <div class="col-2">
+    <div class="row justify-content-center gx-5 gy-5 mx-auto">
+              <div class="col-4">
                 <input type="text" class="form-control mb-1" placeholder="Gewicht Punkt {{ weight + 1 }}"  name="w{{ weight + 1}}" autofocus>
               </div>
     </div>
