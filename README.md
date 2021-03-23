@@ -19,6 +19,14 @@ Weitere Feauteres die noch ganz gut wären:
 - Website mit eigener Domain verbinden um zu testen, wie das so funktioniert
 
 
+## Selbst hosten per Docker:
+Mit Docker kann der Server ganz unproblematisch selbst gehostet werden. 
+```docker
+docker build -t scm-rechner .
+docker run -it --rm -p 5000:5000 --name scm-rechner scm-rechner
+```
+
+
 ## Notiz an mich zum Deployment
 Um den ganzen bums bei der GCloud zu hosten musst du das mit App-Service machen.
 mit "gcloud app deploy" wird das ganze Ding hochgeladen
