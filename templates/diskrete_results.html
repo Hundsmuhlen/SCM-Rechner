@@ -1,0 +1,37 @@
+{% extends "new_index.html"%}
+{% set active_page = "diskrete" %}
+
+{% block body %}
+
+<table class="table table-hover">
+    <h2>Ergebnisse </h2>
+    Neben der Entfernungsmatrix sind in den abwechselnden Spalten jeweils die vi und Ji angegeben <br>
+    Die sj werden für jede Iteration berechnet und stehen wie bei der händischen Berechnung unter der Matrix
+    <hr>
+    {% for row in results %}
+        {% if loop.index0 == 0 %}
+            <tr>
+            <th>i/j</th>
+            {% for col in row %}
+                <td>{{ col }}</td>
+            {% endfor %}
+            </tr>
+
+        {% else %}
+                <tr>
+                    <th>{{ loop.index }}</th>
+                    {% for col in row %}
+
+
+                        <td>{{ col }}</td>
+                    {% endfor %}
+                </tr>
+
+         {% endif %}
+
+
+    {% endfor %}
+</table>
+
+
+{% endblock %}
