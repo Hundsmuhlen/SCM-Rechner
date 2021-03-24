@@ -4,13 +4,13 @@
 {% block body %}
 
 <table class="table table-hover">
-    <h2>Ergebnisse </h2>
+    <h2>Ergebnisse Dual Ascent</h2>
     Neben der Entfernungsmatrix sind in den abwechselnden Spalten jeweils die vi und Ji angegeben. <br>
     Unter den Vi's stehen jeweils die Spaltensummen. <br>
     Die sj werden für jede Iteration berechnet und stehen wie bei der händischen Berechnung unter der Matrix. <br>
     Die einzelnen Iterationen sind durch abgetrennt durch "-"
     <hr>
-    {% for row in results %}
+    {% for row in dual_ascent_results %}
         {% if loop.index0 == 0 %}
             <tr>
             <th>i/j</th>
@@ -34,6 +34,37 @@
 
     {% endfor %}
 </table>
+
+    <table class="table table-hover">
+        <br>
+    <h2>Ergebnisse Greedy Heuristik</h2>
+        <br>
+     <div class="alert alert-warning" role="alert">
+        Bei der letzten Iteration kann es zu Fehlern kommen im Algorithmus. <br>
+         Prüfe selbst, ob sich der letzte Standort wirklich eröffnen lässt - omega >= 0 <br>
+         <b>Unter den UI Zeilen stehen die Gesamtkosten</b>
+    </div>
+
+    {% for row in greedy_results %}
+        <tr>
+            {% if loop.index0 == 0 %}
+                {% for col in row %}
+                    <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+
+            {% else  %}
+                <tr>
+                    <th>{{ row[0] }}</th>
+                    {% for col in row %}
+                        {% if loop.index > 1 %}
+                        <td>{{ col }}</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endif %}
+    {% endfor %}
+    </table>
 
 
 {% endblock %}

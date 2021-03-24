@@ -198,32 +198,79 @@ def dual_ascent_zu_grosser_matrix(costMatrix, sj:list, vi, Ji):
     return result
 
 
-def greedy_zu_einer_matrix(costMatrix, wj, delta, ui):
+def greedy_zu_einer_matrix(costMatrix, fj, delta, omega, chosen_js, kostenentwicklung, ui):
     result = costMatrix
+    amount_of_i = len(ui[0])
+    spalte_null = ["i/j"]
+    zeile_null = [i+1 for i in range(len(costMatrix[0]))]
 
-    pass
+    zeile_null.extend([f"vi-{i}" for i in range(len(ui))])
+    spalte_null.extend([i+1 for i in range(len(costMatrix))])
 
-def greedy():
-    input_array2 = [
-        [0, 15, 35, 50, 30, 20],
-        [6, 0, 8, 14, 12, 14],
-        [42, 24, 0, 18, 36, 48],
-        [40, 28, 12, 0, 28, 28],
-        [24, 24, 24, 28, 0, 8],
-        [20, 35, 40, 35, 10, 0]
-    ]
-    # Aufgabe 14
 
-    input_array = [
-        [0, 3, 10, 4, 10, 5],
-        [8, 0, 1, 10, 7, 6],
-        [5, 7, 0, 3, 3, 10],
-        [2, 2, 5, 0, 2, 9],
-        [6, 10, 3, 9, 0, 5],
-        [4, 1, 2, 1, 9, 0]
-    ]
+    #ui transponieren:
+    ui_transponiert = []
+    for i in range(len(ui[0])):
+        ui_t = []
+        for row in ui:
+            ui_t.append(row[i])
+        ui_transponiert.append(ui_t)
 
-    fj = [8, 4, 5, 5, 3, 8]  # Kosten für Eröffnung
+    for row, row_ui in zip(result, ui_transponiert):
+        row.extend(row_ui)
+
+    result.append(["-" for _ in range(len(costMatrix[0]))])
+    spalte_null.append("-")
+    result.insert(0,zeile_null)
+
+    #Die neuen Kosten an das fj hängen und die Zeile dann an result
+    fj_mit_kosten = fj[:]
+    fj_mit_kosten.extend(kostenentwicklung)
+    result.append(fj_mit_kosten)
+    spalte_null.append("fj")
+
+    omega_mit_standort=omega
+    for o, so in zip(omega_mit_standort, chosen_js):
+        o.append("Gewählter Standort:")
+        o.append(so)
+
+    for d, o in zip(delta, omega_mit_standort):
+        result.append(["-" for _ in range(len(o))])
+        result.append(d)
+        result.append(o)
+        spalte_null.append("-")
+        spalte_null.append("delta j")
+        spalte_null.append("omega j")
+
+
+    print(f"Result = {result}")
+    for r, s in zip(result, spalte_null):
+        r.insert(0, s)
+
+    return result
+
+
+def greedy(input_array, fj):
+    # input_array2 = [
+    #     [0, 15, 35, 50, 30, 20],
+    #     [6, 0, 8, 14, 12, 14],
+    #     [42, 24, 0, 18, 36, 48],
+    #     [40, 28, 12, 0, 28, 28],
+    #     [24, 24, 24, 28, 0, 8],
+    #     [20, 35, 40, 35, 10, 0]
+    # ]
+    # # Aufgabe 14
+    #
+    # input_array = [
+    #     [0, 3, 10, 4, 10, 5],
+    #     [8, 0, 1, 10, 7, 6],
+    #     [5, 7, 0, 3, 3, 10],
+    #     [2, 2, 5, 0, 2, 9],
+    #     [6, 10, 3, 9, 0, 5],
+    #     [4, 1, 2, 1, 9, 0]
+    # ]
+    #
+    # fj = [8, 4, 5, 5, 3, 8]  # Kosten für Eröffnung
 
     costMatrix = input_array
     sortedCostMatrix = np.asarray(np.sort(np.array(costMatrix)))
@@ -233,8 +280,11 @@ def greedy():
     print(f"ui 0 = {ui[0]}")
     delta = []
     omega = []
+    chosen_js = []
+    kostenentwicklung = []
     round_counter = 0
     kosten = sum(ui[0])
+    kostenentwicklung.append(kosten)
     print(f"Anfangskosten: {kosten}")
 
     while True:
@@ -251,6 +301,7 @@ def greedy():
         delta.append(delta_temp)
         omega.append(omega_temp)
         chosen_j = omega_temp.index(max(omega_temp))
+        chosen_js.append(chosen_j + 1)
         ui.append(
             [min(ui[-1][i],
                  costMatrix[i][chosen_j])
@@ -258,6 +309,7 @@ def greedy():
         )
 
         kosten = kosten - max(omega_temp)
+        kostenentwicklung.append(kosten)
 
         round_counter += 1
 
@@ -271,6 +323,7 @@ def greedy():
         print(f"ui-{round_counter}: {ui[-1]}")
         print(f"neue Kosten: {kosten}")
 
+    return delta, omega, chosen_js, kostenentwicklung, ui
 
 if __name__ == "__main__":
-    dual_ascent()
+    greedy(1,2)

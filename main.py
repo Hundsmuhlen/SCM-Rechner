@@ -2,12 +2,14 @@ from flask import Flask, render_template, request, redirect, session
 from ScmTest2 import l2metrik, l8metrik, l22metrik, l1metrik, domKrit, schwerpunkt, entfernung, delta, weiszfeld, \
     l8_center_gewichtet_eindimensional, l1_zu_l8_transformation, l8_center_ungewichtet, l8_zu_l1_transformation
 from ScmTest3 import matrix_from_weights_vector
-from diskreteVerfahren import greedy, dual_ascent, dual_ascent_zu_grosser_matrix
+from diskreteVerfahren import greedy, dual_ascent, dual_ascent_zu_grosser_matrix, greedy_zu_einer_matrix
 import numpy as np
 import re
 from itertools import combinations
 from flask import send_from_directory
 import os
+import copy
+
 
 app = Flask(__name__)
 # Hier sollte eigentlich eine geheime Phrase stehen. Ich hab einfach mal das absurdeste genommen, was mir eingefallen ist
@@ -563,13 +565,29 @@ def diskrete_input():
             r.append(float(request.form.get(f"{row + 1}{col + 1}")))
         dist_matrix.append(r)
 
+    distance_matrix = copy.deepcopy(dist_matrix)
+    # d_matrix = copy.deepcopy(dist_matrix)
+    # weights_two = copy.deepcopy(weights_vector)
+    weights = copy.deepcopy(weights_vector)
+
     vi, Ji, sj = dual_ascent(cost_array=dist_matrix, fixcosts=weights_vector)
 
-    result_matrix = dual_ascent_zu_grosser_matrix(costMatrix=dist_matrix, sj=sj, vi=vi, Ji=Ji)
+    dual_ascent_result_matrix = dual_ascent_zu_grosser_matrix(costMatrix=dist_matrix, sj=sj, vi=vi, Ji=Ji)
+
+    delt, omega, chosen_js, kostenentwicklung, ui = greedy(input_array=distance_matrix, fj=weights)
+    greedy_results = greedy_zu_einer_matrix(costMatrix=distance_matrix,
+                                            fj=weights,
+                                            delta=delt,
+                                            omega=omega,
+                                            chosen_js=chosen_js,
+                                            kostenentwicklung=kostenentwicklung,
+                                            ui=ui)
 
     # session.pop("nr_of_j", None)
     # session.pop("nr_of_i", None)
-    return render_template("diskrete_results.html", results=result_matrix)
+    return render_template("diskrete_results.html",
+                           dual_ascent_results=dual_ascent_result_matrix,
+                           greedy_results=greedy_results)
 
 
 @app.route("/impressum", methods=["GET"])
