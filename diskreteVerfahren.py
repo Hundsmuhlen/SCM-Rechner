@@ -24,6 +24,7 @@ def dual_ascent(cost_array, fixcosts):
     vi = [[i[0] for i in sortedCostMatrix]]
     #Ji = [[[row.index(i) + 1] for row, i in zip(costMatrix, vi[0])]]
     Ji = [[]]
+    #Ji kann auch mehr als 1 Wert in der ersten ITeration umfassen
     for ri, row in enumerate(costMatrix):
         ji_temp = []
         for i, e in enumerate(row):
