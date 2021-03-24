@@ -593,6 +593,11 @@ def diskrete_input():
                            greedy_results=greedy_results)
 
 
+@app.route("/matrix-multi", methods=["GET", "POST"])
+def matrix_mul_settings():
+    pass
+
+
 @app.route("/impressum", methods=["GET"])
 def impressum():
     return render_template("impressum.html")

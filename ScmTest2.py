@@ -2,6 +2,7 @@ import math
 import numpy as np
 import numpy_ml as npml
 from itertools import combinations
+from copy import deepcopy
 
 def l2metrik(a,b):
     # print(a)
@@ -93,7 +94,7 @@ def l8_center_ungewichtet(punkte):
 
 def l8_center_gewichtet_eindimensional(weights, ein_d_punkte):
 
-    delta_ij = lambda wi, ai, wj, aj: float(((wi*wj)/(wi+wj))*abs(aj-ai))
+    delta_ij = lambda wi, ai, wj, aj: float(((wi*wj)/(wi+wj))*(aj-ai))
     indizes = [i for i in range(len(ein_d_punkte))]
     combis = [i for i in combinations(indizes, 2)]
     combis_of_actual_points = [[ein_d_punkte[i[0]].copy(), ein_d_punkte[i[1]]].copy() for i in combis]
@@ -111,12 +112,13 @@ def l8_center_gewichtet_eindimensional(weights, ein_d_punkte):
     print(combis)
     print("--------------")
 
-
-    delta_max = max(delta_list)
+    deltas_abs = deepcopy(delta_list)
+    deltas_abs = [abs(i) for i in deltas_abs]
+    delta_max = max(deltas_abs)
     # print(f"Index of delta max = {delta_list.index(delta_max)}")
     # print(f"Delta Liste= {delta_list}")
     # print(f"Delta Max = {delta_max}")
-    combi_of_delta_max = combis[delta_list.index(delta_max)]
+    combi_of_delta_max = combis[deltas_abs.index(delta_max)]
     p = combi_of_delta_max[0]
     q = combi_of_delta_max[1]
 
