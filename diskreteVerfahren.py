@@ -22,7 +22,15 @@ def dual_ascent(cost_array, fixcosts):
 
     I = [i + 1 for i in range(len(costMatrix))]
     vi = [[i[0] for i in sortedCostMatrix]]
-    Ji = [[[row.index(i) + 1] for row, i in zip(costMatrix, vi[0])]]
+    #Ji = [[[row.index(i) + 1] for row, i in zip(costMatrix, vi[0])]]
+    Ji = [[]]
+    for ri, row in enumerate(costMatrix):
+        ji_temp = []
+        for i, e in enumerate(row):
+            if e == sortedCostMatrix[ri][0]:
+                ji_temp.append(i+1)
+        Ji[0].append(ji_temp)
+
     print(I)
     print(vi)
     print(f"Ji = {Ji}")
