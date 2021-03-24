@@ -84,8 +84,8 @@ def l8_center_ungewichtet(punkte):
     all_y = [punkt[1] for punkt in punkte]
     unten_links = [min(all_x), min(all_y)]
     oben_rechts = [max(all_x), max(all_y)]
-    delta_x = oben_rechts[0] - unten_links[0]
-    delta_y = oben_rechts[1] - unten_links[0]
+    delta_x = abs(oben_rechts[0] - unten_links[0])
+    delta_y = abs(oben_rechts[1] - unten_links[1])
     quadrat = lambda dx, dy: dx == dy
     mittelpunkt = [unten_links[0] + delta_x/2, unten_links[1] + delta_y/2]
 
@@ -96,7 +96,7 @@ def l8_center_gewichtet_eindimensional(weights, ein_d_punkte):
     delta_ij = lambda wi, ai, wj, aj: float(((wi*wj)/(wi+wj))*abs(aj-ai))
     indizes = [i for i in range(len(ein_d_punkte))]
     combis = [i for i in combinations(indizes, 2)]
-    combis_of_actual_points = [[ein_d_punkte[i[0]], ein_d_punkte[i[1]]] for i in combis]
+    combis_of_actual_points = [[ein_d_punkte[i[0]].copy(), ein_d_punkte[i[1]]].copy() for i in combis]
 
 
     delta_list = []
@@ -113,7 +113,9 @@ def l8_center_gewichtet_eindimensional(weights, ein_d_punkte):
 
 
     delta_max = max(delta_list)
-    print(f"Index of delta max = {delta_list.index(delta_max)}")
+    # print(f"Index of delta max = {delta_list.index(delta_max)}")
+    # print(f"Delta Liste= {delta_list}")
+    # print(f"Delta Max = {delta_max}")
     combi_of_delta_max = combis[delta_list.index(delta_max)]
     p = combi_of_delta_max[0]
     q = combi_of_delta_max[1]
@@ -122,7 +124,7 @@ def l8_center_gewichtet_eindimensional(weights, ein_d_punkte):
 
     x_stern = opt_punkt(weights[p], ein_d_punkte[p], weights[q], ein_d_punkte[q])
 
-    return combis_of_actual_points, delta_list, delta_max, combi_of_delta_max, x_stern
+    return combis, combis_of_actual_points, delta_list, delta_max, combi_of_delta_max, x_stern
 
 def schwerpunkt(weights,punkte):
     zähler = sum([w*p for w,p in zip(weights, punkte)])

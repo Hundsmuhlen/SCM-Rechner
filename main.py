@@ -466,7 +466,7 @@ def l1_l8_center_input():
                                    message="Du musst für alle Punkte Werte eigeben.\n "
                                            "Verwende Punkte statt Kommas! - ValueError")
 
-    if len(weights) != len(punkte):
+    if len(weights) != len(punkte) and len(weights) > 0:
         return render_template("error_template.html", page="l1-l8-center",
                                message="Eingabefehler! Gleich viele Gewichte und Punkte eingeben")
     print("x und y eingelesen")
@@ -488,27 +488,27 @@ def l1_l8_center_input():
         mittelpunkt_t = l8_zu_l1_transformation([mittelpunkt])
 
         return render_template("l1_l8_ungewichtet_results.html",
-                               unten_links=unten_links,
-                               oben_rechts=oben_rechts,
-                               delta_x=delta_x,
-                               delta_y=delta_y,
+                               unten_links=np.round(unten_links,4),
+                               oben_rechts=np.round(oben_rechts,4),
+                               delta_x=np.round(delta_x,4),
+                               delta_y=np.round(delta_y,4),
                                quadrat=quadrat,
-                               mittelpunkt=mittelpunkt,
+                               mittelpunkt=np.round(mittelpunkt,4),
                                l1_chosen=l1_metrik_chosen,
-                               unten_links_t=np.asarray(unten_links_t)[0],
-                               oben_rechts_t=np.asarray(oben_rechts_t)[0],
+                               unten_links_t=np.round(np.asarray(unten_links_t)[0],4),
+                               oben_rechts_t=np.round(np.asarray(oben_rechts_t)[0],4),
                                delta_x_t="gilt nur für l unendlich",
                                delta_y_t="gilt nur für l unendlich",
                                quadrat_t="gilt nur für l unendlich",
-                               mittelpunkt_t=np.asarray(mittelpunkt_t)[0])
+                               mittelpunkt_t=np.round(np.asarray(mittelpunkt_t)[0],4))
 
     else:
         x_punkte = [punkt[0] for punkt in transformierte_punkte]
         y_punkte = [punkt[1] for punkt in transformierte_punkte]
 
-        combis, x_delta_list, x_delta_max, x_combi_of_delta_max, x_stern = l8_center_gewichtet_eindimensional(weights,
+        combis, combis_of_actual_points_x, x_delta_list, x_delta_max, x_combi_of_delta_max, x_stern = l8_center_gewichtet_eindimensional(weights,
                                                                                                               x_punkte)
-        combis2, y_delta_list, y_delta_max, y_combi_of_delta_max, y_stern = l8_center_gewichtet_eindimensional(weights, y_punkte)
+        combis2, combis_of_actual_points_y, y_delta_list, y_delta_max, y_combi_of_delta_max, y_stern = l8_center_gewichtet_eindimensional(weights, y_punkte)
 
         x_y_stern_t = l8_zu_l1_transformation([[x_stern,y_stern]])
 
@@ -516,17 +516,19 @@ def l1_l8_center_input():
         return render_template("l1_l8_gewichtet_results.html",
                                combi_len=len(combis),
                                combis=combis,
-                               x_delta_list=x_delta_list,
-                               y_delta_list=y_delta_list,
-                               x_delta_max=x_delta_max,
+                               combis_of_actual_points_x=combis_of_actual_points_x,
+                               combis_of_actual_points_y=combis_of_actual_points_y,
+                               x_delta_list=np.round(x_delta_list,4),
+                               y_delta_list=np.round(y_delta_list,4),
+                               x_delta_max=np.round(x_delta_max,4),
                                x_combi_of_delta_max=x_combi_of_delta_max,
-                               x_stern=x_stern,
-                               y_stern=y_stern,
-                               y_delta_max=y_delta_max,
+                               x_stern=np.round(x_stern,4),
+                               y_stern=np.round(y_stern,4),
+                               y_delta_max=np.round(y_delta_max,4),
                                y_combi_of_delta_max=y_combi_of_delta_max,
                                l1_chosen=l1_metrik_chosen,
-                               x_stern_t=np.asarray(x_y_stern_t)[0][0],
-                               y_stern_t=np.asarray(x_y_stern_t)[0][1]
+                               x_stern_t=np.round(np.asarray(x_y_stern_t)[0][0],4),
+                               y_stern_t=np.round(np.asarray(x_y_stern_t)[0][1],4)
                                )
 
         pass

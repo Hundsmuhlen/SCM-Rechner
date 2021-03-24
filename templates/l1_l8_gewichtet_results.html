@@ -3,7 +3,10 @@
 
 {% block body %}
     <h2>Ergenisse</h2>
-    <b></b>
+
+    <b>Zur Berechnung der Delta ij Werte wird hier die Formel für das gewichtete Delta, wie auch in der Vorlesung genutzt!</b>
+    <br>
+    <hr>
     <table class="table">
         <tr>
             <th>Delta ij max für x Koordinaten:</th>
@@ -30,10 +33,15 @@
             {% endif %}
         </tr>
     </table>
-
+    <br>
+    <h4>Diese Tabelle gilt nur für die L-unendlich Metrik.</h4>
+    <h5>{% if l1_chosen %} Deine eingegebenen Punkte wurden in die L-unendlich Metrik transformiert! {% endif %}</h5>
+    <hr>
     <table class="table">
         <tr>
-            <th>Punktkombination ij</th>
+            <th>Punktkombination ij - Nach Index</th>
+            <th>Punktkombination ij - x Koordinaten</th>
+            <th>Punktkombination ij - y Koordinaten</th>
             <th>Delta ij für x Wert</th>
             <th>Delta ij für y Wert</th>
 
@@ -41,6 +49,8 @@
             {% for i in range(combi_len) %}
                 <tr>
                     <td>{{ combis[i] }}</td>
+                    <td>{{ combis_of_actual_points_x[i] }}</td>
+                    <td>{{ combis_of_actual_points_y[i] }}</td>
                     <td>{{ x_delta_list[i] }}</td>
                     <td>{{ y_delta_list[i] }}</td>
                 </tr>
