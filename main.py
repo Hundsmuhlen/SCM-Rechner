@@ -429,6 +429,7 @@ def l1_l8_center_settings():
         return render_template("anzahl_punkte_template.html",
                                page="l1-l8-center",
                                heading="L1 und L-Unendlich Centerprobleme",
+                               message="Du kannst später entscheiden, ob du den gewichteten Fall oder ungewichteten Fall haben willst",
                                inhalt="Entscheide im nächsten Schritt, ob du die l1 oder l unendlich Metrik willst",
                                warning=True,
                                name_of_input="l1_l8_center_amount_points")
